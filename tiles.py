@@ -5,12 +5,15 @@ import enum
 
 GRID_SIZE = 9
 
+
 class Directions(enum.Enum):
     LEFT = 'L'
     RIGHT = 'R'
 
+
 def dir_flip(direction):
     return Directions.LEFT if direction == Directions.RIGHT else Directions.RIGHT
+
 
 Tile = Dict[Directions, int]
 
@@ -58,8 +61,11 @@ def collapse(wave_function, cell_index, tile):
     
     wave_function[cell_index].tile = tile
     
-    propagation = [{'direction': Directions.LEFT, 'constraint': wave_function[cell_index].connectors[Directions.LEFT]}]
-    for cell in wave_function[max(cell_index-1, 0)::-1]:
+    propagation = [{
+        'direction': Directions.LEFT,
+        'constraint': wave_function[cell_index].connectors[Directions.LEFT],
+    }]
+    for cell in wave_function[max(cell_index - 1, 0)::-1]:
         if cell == wave_function[cell_index]:  # Prevent accidental wrap-around
             break
         
@@ -68,8 +74,11 @@ def collapse(wave_function, cell_index, tile):
             break
     
     
-    propagation = [{'direction': Directions.RIGHT, 'constraint': wave_function[cell_index].connectors[Directions.RIGHT]}]
-    for cell in wave_function[cell_index+1:]:
+    propagation = [{
+        'direction': Directions.RIGHT,
+        'constraint': wave_function[cell_index].connectors[Directions.RIGHT],
+    }]
+    for cell in wave_function[cell_index + 1:]:
         if cell == wave_function[cell_index]:  # Prevent accidental wrap-around
             break
         
@@ -103,7 +112,7 @@ def render_state(wave_function):
         return {
             0: '╔══╗',
             1: f'║{left}{right}║',
-            2: '╚══╝'
+            2: '╚══╝',
         }[line]
     
     # Selected tiles
@@ -119,7 +128,10 @@ def render_state(wave_function):
         for line in range(3):
             tile_strings = []
             for cell in wave_function:
-                tile_strings.append(render_tile(cell.state[i], line) if i < len(cell.state) else '    ')
+                tile_strings.append((
+                    render_tile(cell.state[i], line)
+                    if i < len(cell.state) else '    '
+                ))
             print('  ' + ' '.join(tile_strings) + '  ')
 
 
@@ -136,7 +148,7 @@ if __name__ == '__main__':
     all_tiles = [t11, t12, t22, t23, t33, t34, t44]
     
     
-    print('Initial State...')    
+    print('Initial State...')
     wave_function = [Cell(state = all_tiles) for _ in range(GRID_SIZE)]
     render_state(wave_function)
     
@@ -146,7 +158,11 @@ if __name__ == '__main__':
         cell_index = get_most_contrained_cell(wave_function)
         tile = random.choice(wave_function[cell_index].state)
         
-        print('Selected {}-{} at position {}'.format(tile[Directions.LEFT], tile[Directions.RIGHT], cell_index))
+        print('Selected {}-{} at position {}'.format(
+            tile[Directions.LEFT],
+            tile[Directions.RIGHT],
+            cell_index,
+        ))
         collapse(wave_function, cell_index, tile)
         render_state(wave_function)
 
