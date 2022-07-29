@@ -1,17 +1,18 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Dict
 import random
+import enum
 
 GRID_SIZE = 9
 
+class Directions(enum.Enum):
+    LEFT = 'L'
+    RIGHT = 'R'
 
-@dataclass
-class Tile:
-    left: int
-    right: int
-    
-    def __repr__(self):
-        return f'Tile({self.left}-{self.right})'
+def dir_flip(direction):
+    return Directions.LEFT if direction == Directions.RIGHT else Directions.RIGHT
+
+Tile = Dict[Directions, int]
 
 
 @dataclass
@@ -29,34 +30,52 @@ class Cell:
     @tile.setter
     def tile(self, tile):
         self.state = [tile]
+    
+    @property
+    def connectors(self):
+        return {
+            direction: {tile[direction] for tile in self.state}
+            for direction in Directions
+        }
+    
+    def constrain(self, direction, constraint):
+        
+        original_connectors = self.connectors
+        self.state = [
+            tile for tile in self.state
+            if tile[dir_flip(direction)] in constraint
+        ]
+        
+        return [
+            {'direction': onward_direction, 'constraint': self.connectors[onward_direction]}
+            for onward_direction in Directions
+            if self.connectors[onward_direction] != original_connectors[onward_direction]
+            and onward_direction != dir_flip(direction)
+        ]
 
 
 def collapse(wave_function, cell_index, tile):
     
     wave_function[cell_index].tile = tile
     
-    inwards_conn = {wave_function[cell_index].tile.left}
+    propagation = [{'direction': Directions.LEFT, 'constraint': wave_function[cell_index].connectors[Directions.LEFT]}]
     for cell in wave_function[max(cell_index-1, 0)::-1]:
-        
         if cell == wave_function[cell_index]:  # Prevent accidental wrap-around
             break
         
-        original_outwards_conn = {tile.left for tile in cell.state}
-        cell.state = [tile for tile in cell.state if tile.right in inwards_conn]
-        new_outwards_conn = {tile.left for tile in cell.state}
-        if new_outwards_conn == original_outwards_conn:
+        propagation = cell.constrain(**propagation[0])
+        if not propagation:
             break
-        inwards_conn = new_outwards_conn
     
-    inwards_conn = {wave_function[cell_index].tile.right}
+    
+    propagation = [{'direction': Directions.RIGHT, 'constraint': wave_function[cell_index].connectors[Directions.RIGHT]}]
     for cell in wave_function[cell_index+1:]:
-    
-        original_outwards_conn = {tile.right for tile in cell.state}
-        cell.state = [tile for tile in cell.state if tile.left in inwards_conn]
-        new_outwards_conn = {tile.right for tile in cell.state}
-        if new_outwards_conn == original_outwards_conn:
+        if cell == wave_function[cell_index]:  # Prevent accidental wrap-around
             break
-        inwards_conn = new_outwards_conn
+        
+        propagation = cell.constrain(**propagation[0])
+        if not propagation:
+            break
 
 
 def get_most_contrained_cell(wave_function):
@@ -79,8 +98,8 @@ def get_most_contrained_cell(wave_function):
 def render_state(wave_function):
     
     def render_tile(tile, line):
-        left = tile.left if tile else '?'
-        right = tile.right if tile else '?'
+        left = tile[Directions.LEFT] if tile else '?'
+        right = tile[Directions.RIGHT] if tile else '?'
         return {
             0: '╔══╗',
             1: f'║{left}{right}║',
@@ -106,13 +125,13 @@ def render_state(wave_function):
 
 if __name__ == '__main__':
     
-    t11 = Tile(left = 1, right = 1)
-    t12 = Tile(left = 1, right = 2)
-    t22 = Tile(left = 2, right = 2)
-    t23 = Tile(left = 2, right = 3)
-    t33 = Tile(left = 3, right = 3)
-    t34 = Tile(left = 3, right = 4)
-    t44 = Tile(left = 4, right = 4)
+    t11 = {Directions.LEFT: 1, Directions.RIGHT: 1}
+    t12 = {Directions.LEFT: 1, Directions.RIGHT: 2}
+    t22 = {Directions.LEFT: 2, Directions.RIGHT: 2}
+    t23 = {Directions.LEFT: 2, Directions.RIGHT: 3}
+    t33 = {Directions.LEFT: 3, Directions.RIGHT: 3}
+    t34 = {Directions.LEFT: 3, Directions.RIGHT: 4}
+    t44 = {Directions.LEFT: 4, Directions.RIGHT: 4}
     
     all_tiles = [t11, t12, t22, t23, t33, t34, t44]
     
@@ -127,7 +146,7 @@ if __name__ == '__main__':
         cell_index = get_most_contrained_cell(wave_function)
         tile = random.choice(wave_function[cell_index].state)
         
-        print('Selected {} at position {}'.format(tile, cell_index))
+        print('Selected {}-{} at position {}'.format(tile[Directions.LEFT], tile[Directions.RIGHT], cell_index))
         collapse(wave_function, cell_index, tile)
         render_state(wave_function)
 
