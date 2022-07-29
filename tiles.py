@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List
 import random
 
 GRID_SIZE = 9
@@ -13,29 +14,46 @@ class Tile:
         return f'Tile({self.left}-{self.right})'
 
 
+@dataclass
+class Cell:
+    state: List[Tile]
+    
+    @property
+    def collapsed(self):
+        return len(self.state) == 1
+    
+    @property
+    def tile(self):
+        return self.state[0] if self.collapsed else None
+    
+    @tile.setter
+    def tile(self, tile):
+        self.state = [tile]
+
+
 def collapse(wave_function, cell_index, tile):
     
-    wave_function[cell_index] = [tile]
+    wave_function[cell_index].tile = tile
     
-    inwards_conn = {wave_function[cell_index][0].left}
-    for i, cell_opt in enumerate(wave_function[max(cell_index-1, 0)::-1]):
+    inwards_conn = {wave_function[cell_index].tile.left}
+    for cell in wave_function[max(cell_index-1, 0)::-1]:
         
-        if i == cell_index:  # Prevent accidental wrap-around
+        if cell == wave_function[cell_index]:  # Prevent accidental wrap-around
             break
         
-        original_outwards_conn = {tile.left for tile in cell_opt}
-        wave_function[cell_index-i-1] = [tile for tile in cell_opt if tile.right in inwards_conn]
-        new_outwards_conn = {tile.left for tile in wave_function[cell_index-i-1]}
+        original_outwards_conn = {tile.left for tile in cell.state}
+        cell.state = [tile for tile in cell.state if tile.right in inwards_conn]
+        new_outwards_conn = {tile.left for tile in cell.state}
         if new_outwards_conn == original_outwards_conn:
             break
         inwards_conn = new_outwards_conn
     
-    inwards_conn = {wave_function[cell_index][0].right}
-    for i, cell_opt in enumerate(wave_function[cell_index+1:]):
+    inwards_conn = {wave_function[cell_index].tile.right}
+    for cell in wave_function[cell_index+1:]:
     
-        original_outwards_conn = {tile.right for tile in cell_opt}
-        wave_function[cell_index+i+1] = [tile for tile in cell_opt if tile.left in inwards_conn]
-        new_outwards_conn = {tile.right for tile in wave_function[cell_index+i+1]}
+        original_outwards_conn = {tile.right for tile in cell.state}
+        cell.state = [tile for tile in cell.state if tile.left in inwards_conn]
+        new_outwards_conn = {tile.right for tile in cell.state}
         if new_outwards_conn == original_outwards_conn:
             break
         inwards_conn = new_outwards_conn
@@ -44,10 +62,10 @@ def collapse(wave_function, cell_index, tile):
 def get_most_contrained_cell(wave_function):
     
     possibility_space = {
-        cell_index: len(cell_opt)
-        for cell_index, cell_opt
+        cell_index: len(cell.state)
+        for cell_index, cell
         in enumerate(wave_function)
-        if len(cell_opt) > 1  # Ignore already collapsed cells
+        if not cell.collapsed  # Ignore already collapsed cells
     }
     most_constrained_size = min(possibility_space.values())
     possibility_space = {
@@ -70,9 +88,7 @@ def render_state(wave_function):
         }[line]
     
     # Selected tiles
-    selected_tiles = []
-    for cell_opt in wave_function:
-        selected_tiles.append(cell_opt[0] if len(cell_opt) == 1 else None)
+    selected_tiles = [cell.tile for cell in wave_function]
     for line in range(3):
         tile_strings = [render_tile(tile, line) for tile in selected_tiles]
         print('  ' + ' '.join(tile_strings) + '  ')
@@ -80,11 +96,11 @@ def render_state(wave_function):
     print((5 * len(wave_function) + 3) * '=')
     
     # Cell options
-    for i in range(max(len(cell_opt) for cell_opt in wave_function)):
+    for i in range(max(len(cell.state) for cell in wave_function)):
         for line in range(3):
             tile_strings = []
-            for cell_opt in wave_function:
-                tile_strings.append(render_tile(cell_opt[i], line) if i < len(cell_opt) else '    ')
+            for cell in wave_function:
+                tile_strings.append(render_tile(cell.state[i], line) if i < len(cell.state) else '    ')
             print('  ' + ' '.join(tile_strings) + '  ')
 
 
@@ -102,16 +118,16 @@ if __name__ == '__main__':
     
     
     print('Initial State...')    
-    wave_function = GRID_SIZE * [all_tiles]
+    wave_function = [Cell(state = all_tiles) for _ in range(GRID_SIZE)]
     render_state(wave_function)
     
-    while any([len(cell_opt) > 1 for cell_opt in wave_function]):
+    while any([not cell.collapsed for cell in wave_function]):
         print('')
         print('Performing random collapse...')
-        cell = get_most_contrained_cell(wave_function)
-        tile = random.choice(wave_function[cell])
+        cell_index = get_most_contrained_cell(wave_function)
+        tile = random.choice(wave_function[cell_index].state)
         
-        print('Selected {} at position {}'.format(tile, cell))
-        collapse(wave_function, cell, tile)
+        print('Selected {} at position {}'.format(tile, cell_index))
+        collapse(wave_function, cell_index, tile)
         render_state(wave_function)
 
