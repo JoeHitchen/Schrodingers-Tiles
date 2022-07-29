@@ -70,7 +70,7 @@ if __name__ == '__main__':
     if GRID_CYCLIC:
         tiles.link_cyclical_grid(wave_function)
     else:
-        tiles.link_bounded_grid(wave_function)
+        tiles.link_bounded_1d_grid(wave_function)
     
     print('Initial state')
     render_1d_state(wave_function, cyclic = GRID_CYCLIC)
