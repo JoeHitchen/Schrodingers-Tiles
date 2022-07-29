@@ -1,9 +1,10 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Dict
 import random
 import enum
 
 GRID_SIZE = 9
+GRID_CYCLIC = True
 
 
 class Directions(enum.Enum):
@@ -11,16 +12,41 @@ class Directions(enum.Enum):
     RIGHT = 'R'
 
 
-def dir_flip(direction):
+def flip_direction(direction):
     return Directions.LEFT if direction == Directions.RIGHT else Directions.RIGHT
+
+
+def link_bounded_grid(cells):
+    for index, cell in enumerate(cells[:-1]):
+        cell.link_neighbour(cells[index + 1], Directions.RIGHT)
+
+
+def link_cyclical_grid(cells):
+    link_bounded_grid(cells)
+    cells[-1].link_neighbour(cells[0], Directions.RIGHT)
+
 
 
 Tile = Dict[Directions, int]
 
 
+class PropagationError(Exception):
+    """Used when the wave-function collapse reaches an internally inconsistent state."""
+    pass
+
+
 @dataclass
 class Cell:
     state: List[Tile]
+    neighbours: Dict[Directions, 'Cell'] = field(default_factory = dict)
+    
+    def link_neighbour(self, neighbour, direction):
+        neighbour_direction = flip_direction(direction)
+        assert direction not in self.neighbours and neighbour_direction not in neighbour.neighbours
+        
+        self.neighbours[direction] = neighbour
+        neighbour.neighbours[neighbour_direction] = self
+        
     
     @property
     def collapsed(self):
@@ -46,14 +72,20 @@ class Cell:
         original_connectors = self.connectors
         self.state = [
             tile for tile in self.state
-            if tile[dir_flip(direction)] in constraint
+            if tile[flip_direction(direction)] in constraint
         ]
+        if not self.state:
+            raise PropagationError(f'{self} has no remaining state options')
         
         return [
-            {'direction': onward_direction, 'constraint': self.connectors[onward_direction]}
-            for onward_direction in Directions
+            {
+                'cell': self.neighbours[onward_direction],
+                'direction': onward_direction,
+                'constraint': self.connectors[onward_direction],
+            }
+            for onward_direction in self.neighbours
             if self.connectors[onward_direction] != original_connectors[onward_direction]
-            and onward_direction != dir_flip(direction)
+            and onward_direction != flip_direction(direction)
         ]
 
 
@@ -61,30 +93,17 @@ def collapse(wave_function, cell_index, tile):
     
     wave_function[cell_index].tile = tile
     
-    propagation = [{
-        'direction': Directions.LEFT,
-        'constraint': wave_function[cell_index].connectors[Directions.LEFT],
-    }]
-    for cell in wave_function[max(cell_index - 1, 0)::-1]:
-        if cell == wave_function[cell_index]:  # Prevent accidental wrap-around
-            break
-        
-        propagation = cell.constrain(**propagation[0])
-        if not propagation:
-            break
+    propagations = [{
+        'cell': wave_function[cell_index].neighbours[direction],
+        'direction': direction,
+        'constraint': wave_function[cell_index].connectors[direction],
+    } for direction in wave_function[cell_index].neighbours]
     
-    
-    propagation = [{
-        'direction': Directions.RIGHT,
-        'constraint': wave_function[cell_index].connectors[Directions.RIGHT],
-    }]
-    for cell in wave_function[cell_index + 1:]:
-        if cell == wave_function[cell_index]:  # Prevent accidental wrap-around
-            break
-        
-        propagation = cell.constrain(**propagation[0])
-        if not propagation:
-            break
+    while propagations:
+        propagation = propagations.pop(0)
+        cell = propagation.pop('cell')
+        further_propgations = cell.constrain(**propagation)
+        propagations.extend(further_propgations)
 
 
 def get_most_contrained_cell(wave_function):
@@ -144,12 +163,16 @@ if __name__ == '__main__':
     t33 = {Directions.LEFT: 3, Directions.RIGHT: 3}
     t34 = {Directions.LEFT: 3, Directions.RIGHT: 4}
     t44 = {Directions.LEFT: 4, Directions.RIGHT: 4}
+    t41 = {Directions.LEFT: 4, Directions.RIGHT: 1}
     
-    all_tiles = [t11, t12, t22, t23, t33, t34, t44]
+    all_tiles = [t11, t12, t22, t23, t33, t34, t44, t41]
     
+    
+    wave_function = [Cell(state = all_tiles) for _ in range(GRID_SIZE)]
+    grid_link_map = {True: link_cyclical_grid, False: link_bounded_grid}
+    grid_link_map[GRID_CYCLIC](wave_function)
     
     print('Initial State...')
-    wave_function = [Cell(state = all_tiles) for _ in range(GRID_SIZE)]
     render_state(wave_function)
     
     while any([not cell.collapsed for cell in wave_function]):
