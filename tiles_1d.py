@@ -66,7 +66,7 @@ def render_1d_state(wave_function: List[tiles.Cell], cyclic: bool) -> None:
 if __name__ == '__main__':
     
     tile_set = create_1d_incrementing_tiles(NUM_CONN, cyclic = GRID_CYCLIC)
-    wave_function = [tiles.Cell(state = tile_set) for _ in range(GRID_SIZE)]
+    wave_function = [tiles.Cell(id = str(i + 1), state = tile_set) for i in range(GRID_SIZE)]
     if GRID_CYCLIC:
         tiles.link_cyclical_grid(wave_function)
     else:
@@ -80,7 +80,7 @@ if __name__ == '__main__':
         print('Performing random collapse...')
         cell_index = tiles.get_most_contrained_cell(wave_function)
         tile = random.choice(wave_function[cell_index].state)
-        print('Selected {} at position {}'.format(tile_to_text(tile), cell_index))
+        print('Selected {} for {}'.format(tile_to_text(tile), wave_function[cell_index]))
         
         tiles.collapse(wave_function, cell_index, tile)
         render_1d_state(wave_function, cyclic = GRID_CYCLIC)

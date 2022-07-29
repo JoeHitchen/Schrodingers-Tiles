@@ -37,8 +37,13 @@ class PropagationError(Exception):
 
 @dataclass
 class Cell:
+    id: str
     state: List[Tile]
     neighbours: Dict[Directions, 'Cell'] = field(default_factory = dict)
+    
+    def __str__(self):
+        return f'Cell {self.id}'
+    
     
     def link_neighbour(self, neighbour, direction):
         neighbour_direction = flip_direction(direction)
