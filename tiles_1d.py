@@ -14,24 +14,24 @@ def create_1d_incrementing_tiles(num_conn: int, cyclic: bool = False) -> List[ti
     
     tile_set = []
     for i in range(1, num_conn + 1):
-        tile_set.append({tiles.Directions.LEFT: i, tiles.Directions.RIGHT: i})
+        tile_set.append({grids.Direction.LEFT: i, grids.Direction.RIGHT: i})
         if i < num_conn:
-            tile_set.append({tiles.Directions.LEFT: i, tiles.Directions.RIGHT: i + 1})
+            tile_set.append({grids.Direction.LEFT: i, grids.Direction.RIGHT: i + 1})
         elif cyclic and i > 1:
-            tile_set.append({tiles.Directions.LEFT: i, tiles.Directions.RIGHT: 1})
+            tile_set.append({grids.Direction.LEFT: i, grids.Direction.RIGHT: 1})
     
     return tile_set
 
 
 def tile_to_text(tile: tiles.Tile) -> str:
-    return '[{}-{}]'.format(tile[tiles.Directions.LEFT], tile[tiles.Directions.RIGHT])
+    return '[{}-{}]'.format(tile[grids.Direction.LEFT], tile[grids.Direction.RIGHT])
 
 
 def render_1d_state(wave_function: List[tiles.Cell], cyclic: bool) -> None:
     
     def render_1d_tile(tile: Optional[tiles.Tile], line: int) -> str:
-        left = tile[tiles.Directions.LEFT] if tile else '?'
-        right = tile[tiles.Directions.RIGHT] if tile else '?'
+        left = tile[grids.Direction.LEFT] if tile else '?'
+        right = tile[grids.Direction.RIGHT] if tile else '?'
         return {
             0: '╔══╗',
             1: '║{}{}║'.format(left, right),
@@ -78,15 +78,15 @@ if __name__ == '__main__':
         
         # Left boundary acts rightwards
         wave_function.apply_boundary_condition(
-            grid.get_boundary_points(tiles.Directions.LEFT),
-            tiles.Directions.RIGHT,
+            grid.get_boundary_points(grids.Direction.LEFT),
+            grids.Direction.RIGHT,
             {1},
         )
         
         # Right boundary acts leftwards
         wave_function.apply_boundary_condition(
-            grid.get_boundary_points(tiles.Directions.RIGHT),
-            tiles.Directions.LEFT,
+            grid.get_boundary_points(grids.Direction.RIGHT),
+            grids.Direction.LEFT,
             {NUM_CONN},
         )
     

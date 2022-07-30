@@ -34,18 +34,18 @@ def create_tiles_and_symbols(
     """Creates a set of tiles based on a set of symbols and a connection template."""
     
     tiles_and_symbols = [({
-        tiles.Directions.LEFT: spec[0],
-        tiles.Directions.UP: spec[1],
-        tiles.Directions.RIGHT: spec[2],
-        tiles.Directions.DOWN: spec[3],
+        grids.Direction.LEFT: spec[0],
+        grids.Direction.UP: spec[1],
+        grids.Direction.RIGHT: spec[2],
+        grids.Direction.DOWN: spec[3],
     }, symbols[0])]
     
     for symbol in symbols[1:]:
         tiles_and_symbols.append(({
-            tiles.Directions.LEFT: tiles_and_symbols[-1][0][tiles.Directions.DOWN],
-            tiles.Directions.UP: tiles_and_symbols[-1][0][tiles.Directions.LEFT],
-            tiles.Directions.RIGHT: tiles_and_symbols[-1][0][tiles.Directions.UP],
-            tiles.Directions.DOWN: tiles_and_symbols[-1][0][tiles.Directions.RIGHT],
+            grids.Direction.LEFT: tiles_and_symbols[-1][0][grids.Direction.DOWN],
+            grids.Direction.UP: tiles_and_symbols[-1][0][grids.Direction.LEFT],
+            grids.Direction.RIGHT: tiles_and_symbols[-1][0][grids.Direction.UP],
+            grids.Direction.DOWN: tiles_and_symbols[-1][0][grids.Direction.RIGHT],
         }, symbol))
     
     return tiles_and_symbols
@@ -81,10 +81,10 @@ if __name__ == '__main__':
         if not tile:
             return None
         return (
-            tile[tiles.Directions.LEFT],
-            tile[tiles.Directions.UP],
-            tile[tiles.Directions.RIGHT],
-            tile[tiles.Directions.DOWN],
+            tile[grids.Direction.LEFT],
+            tile[grids.Direction.UP],
+            tile[grids.Direction.RIGHT],
+            tile[grids.Direction.DOWN],
         )
     
     def render_2d_tile(tile: Optional[tiles.Tile]) -> str:
@@ -108,15 +108,15 @@ if __name__ == '__main__':
         
         # Upper boundary acts downwards
         wave_function.apply_boundary_condition(
-            grid.get_boundary_points(tiles.Directions.UP),
-            tiles.Directions.DOWN,
+            grid.get_boundary_points(grids.Direction.UP),
+            grids.Direction.DOWN,
             {0},
         )
         
         # Lower boundary acts upwards
         wave_function.apply_boundary_condition(
-            grid.get_boundary_points(tiles.Directions.DOWN),
-            tiles.Directions.UP,
+            grid.get_boundary_points(grids.Direction.DOWN),
+            grids.Direction.UP,
             {0},
         )
     
@@ -124,15 +124,15 @@ if __name__ == '__main__':
         
         # Left boundary acts rightwards
         wave_function.apply_boundary_condition(
-            grid.get_boundary_points(tiles.Directions.LEFT),
-            tiles.Directions.RIGHT,
+            grid.get_boundary_points(grids.Direction.LEFT),
+            grids.Direction.RIGHT,
             {0},
         )
         
         # Right boundary acts leftwards
         wave_function.apply_boundary_condition(
-            grid.get_boundary_points(tiles.Directions.RIGHT),
-            tiles.Directions.LEFT,
+            grid.get_boundary_points(grids.Direction.RIGHT),
+            grids.Direction.LEFT,
             {0},
         )
     
