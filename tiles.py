@@ -84,7 +84,7 @@ class Cell:
     @property
     def connectors(self):
         return {
-            direction: {tile[direction] for tile in self.state}
+            direction: {tile[direction] for tile in self.state if direction in tile}
             for direction in Directions
         }
     
