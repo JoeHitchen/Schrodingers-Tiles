@@ -4,18 +4,46 @@ import math
 import tiles
 
 
-GRID_SIZE = 4
+GRID_SIZE = 16
+
+light_corner = ['┘', '└', '┌', '┐']
+light_tshape = ['┴', '├', '┬', '┤']
+light_straight = ['─', '│']
+light_cross = ['┼']
+
+double_corner = ['╝', '╚', '╔', '╗']
+double_tshape = ['╩', '╠', '╦', '╣']
+double_straight = ['═', '║']
+double_cross = ['╬']
+
+light_double_corner = ['╜', '╘', '╓', '╕']
+light_double_tshape = ['╨', '╞', '╥', '╡']
+light_double_cross = ['╫']
+
+double_light_corner = ['╛', '╙', '╒', '╖']
+double_light_tshape = ['╧', '╟', '╤', '╢']
+double_light_cross = ['╪']
 
 
-def render_2d_tile(tile):
-    return {
-        tile_conn(t12): '┘', tile_conn(t13): '─',
-        tile_conn(t14): '┐', tile_conn(t23): '└',
-        tile_conn(t24): '│', tile_conn(t34): '┌',
-        tile_conn(t123): '┴', tile_conn(t124): '┤',
-        tile_conn(t134): '┬', tile_conn(t234): '├',
-        tile_conn(t1234): '┼',
-    }.get(tile_conn(tile), '?')
+def create_tiles_and_symbols(symbols, spec):
+    """Creates a set of tiles based on a set of symbols and a connection template."""
+    
+    tiles_and_symbols = [({
+        tiles.Directions.LEFT: spec[0],
+        tiles.Directions.UP: spec[1],
+        tiles.Directions.RIGHT: spec[2],
+        tiles.Directions.DOWN: spec[3],
+    }, symbols[0])]
+    
+    for symbol in symbols[1:]:
+        tiles_and_symbols.append(({
+            tiles.Directions.LEFT: tiles_and_symbols[-1][0][tiles.Directions.DOWN],
+            tiles.Directions.UP: tiles_and_symbols[-1][0][tiles.Directions.LEFT],
+            tiles.Directions.RIGHT: tiles_and_symbols[-1][0][tiles.Directions.UP],
+            tiles.Directions.DOWN: tiles_and_symbols[-1][0][tiles.Directions.RIGHT],
+        }, symbol))
+    
+    return tiles_and_symbols
 
 
 def render_2d_state(cells):
@@ -27,50 +55,23 @@ def render_2d_state(cells):
 
 if __name__ == '__main__':
     
-    t12 = {
-        tiles.Directions.LEFT: 1, tiles.Directions.UP: 1,
-        tiles.Directions.RIGHT: 0, tiles.Directions.DOWN: 0,
-    }
-    t13 = {
-        tiles.Directions.LEFT: 1, tiles.Directions.UP: 0,
-        tiles.Directions.RIGHT: 1, tiles.Directions.DOWN: 0,
-    }
-    t14 = {
-        tiles.Directions.LEFT: 1, tiles.Directions.UP: 0,
-        tiles.Directions.RIGHT: 0, tiles.Directions.DOWN: 1,
-    }
-    t23 = {
-        tiles.Directions.LEFT: 0, tiles.Directions.UP: 1,
-        tiles.Directions.RIGHT: 1, tiles.Directions.DOWN: 0,
-    }
-    t24 = {
-        tiles.Directions.LEFT: 0, tiles.Directions.UP: 1,
-        tiles.Directions.RIGHT: 0, tiles.Directions.DOWN: 1,
-    }
-    t34 = {
-        tiles.Directions.LEFT: 0, tiles.Directions.UP: 0,
-        tiles.Directions.RIGHT: 1, tiles.Directions.DOWN: 1,
-    }
-    t123 = {
-        tiles.Directions.LEFT: 1, tiles.Directions.UP: 1,
-        tiles.Directions.RIGHT: 1, tiles.Directions.DOWN: 0,
-    }
-    t124 = {
-        tiles.Directions.LEFT: 1, tiles.Directions.UP: 1,
-        tiles.Directions.RIGHT: 0, tiles.Directions.DOWN: 1,
-    }
-    t134 = {
-        tiles.Directions.LEFT: 1, tiles.Directions.UP: 0,
-        tiles.Directions.RIGHT: 1, tiles.Directions.DOWN: 1,
-    }
-    t234 = {
-        tiles.Directions.LEFT: 0, tiles.Directions.UP: 1,
-        tiles.Directions.RIGHT: 1, tiles.Directions.DOWN: 1,
-    }
-    t1234 = {
-        tiles.Directions.LEFT: 1, tiles.Directions.UP: 1,
-        tiles.Directions.RIGHT: 1, tiles.Directions.DOWN: 1,
-    }
+    tiles_and_symbols = [
+        *create_tiles_and_symbols(' ', (0, 0, 0, 0)),
+        *create_tiles_and_symbols(light_corner, (1, 1, 0, 0)),
+        *create_tiles_and_symbols(light_tshape, (1, 1, 1, 0)),
+        *create_tiles_and_symbols(light_straight, (1, 0, 1, 0)),
+        *create_tiles_and_symbols(light_cross, (1, 1, 1, 1)),
+        *create_tiles_and_symbols(double_corner, (2, 2, 0, 0)),
+        *create_tiles_and_symbols(double_tshape, (2, 2, 2, 0)),
+        *create_tiles_and_symbols(double_straight, (2, 0, 2, 0)),
+        *create_tiles_and_symbols(double_cross, (2, 2, 2, 2)),
+        *create_tiles_and_symbols(light_double_corner, (1, 2, 0, 0)),
+        *create_tiles_and_symbols(light_double_tshape, (1, 2, 1, 0)),
+        *create_tiles_and_symbols(light_double_cross, (1, 2, 1, 2)),
+        *create_tiles_and_symbols(double_light_corner, (2, 1, 0, 0)),
+        *create_tiles_and_symbols(double_light_tshape, (2, 1, 2, 0)),
+        *create_tiles_and_symbols(double_light_cross, (2, 1, 2, 1)),
+    ]
     
     def tile_conn(tile):
         if not tile:
@@ -82,9 +83,13 @@ if __name__ == '__main__':
             tile[tiles.Directions.DOWN],
         )
     
-    tile_set = [t12, t13, t14, t23, t24, t34, t123, t124, t134, t234, t1234]
-    for tile in tile_set:
-        print(render_2d_tile(tile))
+    def render_2d_tile(tile):
+        return {
+            tile_conn(map_tile): map_symbol
+            for map_tile, map_symbol in tiles_and_symbols
+        }.get(tile_conn(tile), '?')
+    
+    tile_set = [tile for tile, symbol in tiles_and_symbols]
     
     
     wave_function = [tiles.Cell(id = str(i + 1), state = tile_set) for i in range(GRID_SIZE ** 2)]
