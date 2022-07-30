@@ -78,7 +78,7 @@ if __name__ == '__main__':
     while not wave_function.collapsed:
         print('')
         print('Performing random collapse...')
-        cell = wave_function.get_most_contrained_cell()
+        cell = wave_function.get_most_constrained_cell()
         tile = random.choice(cell.state)
         print('Selected {} for {}'.format(tile_to_text(tile), cell))
         

@@ -141,7 +141,7 @@ class WaveFunction:
     def collapsed(self) -> bool:
         return all(cell.collapsed for cell in self.cells)
     
-    def get_most_contrained_cell(self) -> Cell:
+    def get_most_constrained_cell(self) -> Cell:
         """Randomly selects a cell with the smallest possibility space remaining."""
         
         possibility_space = {
