@@ -22,7 +22,10 @@ def flip_direction(direction: Direction) -> Direction:
 
 class Grid(Protocol):
     
+    size_x: int
+    size_y: int
     size_total: int
+    cyclic_x: bool
     
     def make_cell_id(self, index: int) -> str:
         pass
@@ -38,6 +41,7 @@ class Grid1D():
     
     def __init__(self, size_x: int, cyclic_x: bool) -> None:
         self.size_x = size_x
+        self.size_y = 1
         self.size_total = size_x
         self.cyclic_x = cyclic_x
     
