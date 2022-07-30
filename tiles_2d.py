@@ -2,6 +2,7 @@ from typing import List, Tuple, Optional
 import random
 
 import tiles
+import grids
 
 
 GRID_SIZE = (32, 8)
@@ -33,18 +34,18 @@ def create_tiles_and_symbols(
     """Creates a set of tiles based on a set of symbols and a connection template."""
     
     tiles_and_symbols = [({
-        tiles.Directions.LEFT: spec[0],
-        tiles.Directions.UP: spec[1],
-        tiles.Directions.RIGHT: spec[2],
-        tiles.Directions.DOWN: spec[3],
+        grids.Direction.LEFT: spec[0],
+        grids.Direction.UP: spec[1],
+        grids.Direction.RIGHT: spec[2],
+        grids.Direction.DOWN: spec[3],
     }, symbols[0])]
     
     for symbol in symbols[1:]:
         tiles_and_symbols.append(({
-            tiles.Directions.LEFT: tiles_and_symbols[-1][0][tiles.Directions.DOWN],
-            tiles.Directions.UP: tiles_and_symbols[-1][0][tiles.Directions.LEFT],
-            tiles.Directions.RIGHT: tiles_and_symbols[-1][0][tiles.Directions.UP],
-            tiles.Directions.DOWN: tiles_and_symbols[-1][0][tiles.Directions.RIGHT],
+            grids.Direction.LEFT: tiles_and_symbols[-1][0][grids.Direction.DOWN],
+            grids.Direction.UP: tiles_and_symbols[-1][0][grids.Direction.LEFT],
+            grids.Direction.RIGHT: tiles_and_symbols[-1][0][grids.Direction.UP],
+            grids.Direction.DOWN: tiles_and_symbols[-1][0][grids.Direction.RIGHT],
         }, symbol))
     
     return tiles_and_symbols
@@ -80,10 +81,10 @@ if __name__ == '__main__':
         if not tile:
             return None
         return (
-            tile[tiles.Directions.LEFT],
-            tile[tiles.Directions.UP],
-            tile[tiles.Directions.RIGHT],
-            tile[tiles.Directions.DOWN],
+            tile[grids.Direction.LEFT],
+            tile[grids.Direction.UP],
+            tile[grids.Direction.RIGHT],
+            tile[grids.Direction.DOWN],
         )
     
     def render_2d_tile(tile: Optional[tiles.Tile]) -> str:
@@ -92,43 +93,18 @@ if __name__ == '__main__':
             for map_tile, map_symbol in tiles_and_symbols
         }.get(tile_conn(tile), '?')
     
+    
+    grid = grids.Grid2D(*GRID_SIZE, *GRID_CYCLIC)
     tile_set = [tile for tile, symbol in tiles_and_symbols]
-    
-    
-    wave_function = tiles.WaveFunction([
-        tiles.Cell(id = f'{i + 1}-{j + 1}', state = tile_set)
-        for j in range(GRID_SIZE[1]) for i in range(GRID_SIZE[0])
-    ])
-    tiles.link_2d_grid(wave_function.cells, GRID_SIZE, GRID_CYCLIC)
-    
-    boundary_conditions: List[tiles.Propagation] = []
+    wave_function = tiles.WaveFunction(grid, tile_set)
     
     if not GRID_CYCLIC[1]:
-        for i in range(GRID_SIZE[0]):
-            boundary_conditions.append({
-                'cell': wave_function.cells[i],
-                'direction': tiles.Directions.DOWN,
-                'constraint': {0},
-            })
-            boundary_conditions.append({
-                'cell': wave_function.cells[- i - 1],
-                'direction': tiles.Directions.UP,
-                'constraint': {0},
-            })
+        wave_function.apply_boundary_constraint(grids.Direction.DOWN, {0})  # Upper boundary
+        wave_function.apply_boundary_constraint(grids.Direction.UP, {0})  # Lower boundary
     
     if not GRID_CYCLIC[0]:
-        for j in range(GRID_SIZE[1]):
-            boundary_conditions.append({
-                'cell': wave_function.cells[GRID_SIZE[0] * j],
-                'direction': tiles.Directions.RIGHT,
-                'constraint': {0},
-            })
-            boundary_conditions.append({
-                'cell': wave_function.cells[GRID_SIZE[0] * (j + 1) - 1],
-                'direction': tiles.Directions.LEFT,
-                'constraint': {0},
-            })
-    wave_function.propagate_constraints(boundary_conditions)
+        wave_function.apply_boundary_constraint(grids.Direction.RIGHT, {0})  # Left boundary
+        wave_function.apply_boundary_constraint(grids.Direction.LEFT, {0})  # Right boundary
     
     
     print('Initial state')
