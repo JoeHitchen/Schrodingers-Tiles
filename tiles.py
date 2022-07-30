@@ -159,6 +159,18 @@ class WaveFunction:
         return self.cells[random.choice(list(possibility_space.keys()))]
     
     
+    def apply_boundary_condition(
+        self,
+        cell_slice: slice,
+        direction: Directions,
+        constraint: Set[int],
+    ) -> None:
+        
+        self.propagate_constraints([{
+            'cell': cell, 'direction': direction, 'constraint': constraint,
+        } for cell in self.cells[cell_slice]])
+    
+    
     @staticmethod
     def propagate_constraints(propagations: List[Propagation]) -> None:
         """Iteratively applies constraints to cells until a consistent state is reached."""

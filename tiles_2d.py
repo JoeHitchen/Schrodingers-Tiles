@@ -2,6 +2,7 @@ from typing import List, Tuple, Optional
 import random
 
 import tiles
+import grids
 
 
 GRID_SIZE = (32, 8)
@@ -101,34 +102,39 @@ if __name__ == '__main__':
     ])
     tiles.link_2d_grid(wave_function.cells, GRID_SIZE, GRID_CYCLIC)
     
-    boundary_conditions: List[tiles.Propagation] = []
+    grid = grids.Grid2D(*GRID_SIZE)
     
     if not GRID_CYCLIC[1]:
-        for i in range(GRID_SIZE[0]):
-            boundary_conditions.append({
-                'cell': wave_function.cells[i],
-                'direction': tiles.Directions.DOWN,
-                'constraint': {0},
-            })
-            boundary_conditions.append({
-                'cell': wave_function.cells[- i - 1],
-                'direction': tiles.Directions.UP,
-                'constraint': {0},
-            })
+        
+        # Upper boundary acts downwards
+        wave_function.apply_boundary_condition(
+            grid.get_boundary_points(tiles.Directions.UP),
+            tiles.Directions.DOWN,
+            {0},
+        )
+        
+        # Lower boundary acts upwards
+        wave_function.apply_boundary_condition(
+            grid.get_boundary_points(tiles.Directions.DOWN),
+            tiles.Directions.UP,
+            {0},
+        )
     
     if not GRID_CYCLIC[0]:
-        for j in range(GRID_SIZE[1]):
-            boundary_conditions.append({
-                'cell': wave_function.cells[GRID_SIZE[0] * j],
-                'direction': tiles.Directions.RIGHT,
-                'constraint': {0},
-            })
-            boundary_conditions.append({
-                'cell': wave_function.cells[GRID_SIZE[0] * (j + 1) - 1],
-                'direction': tiles.Directions.LEFT,
-                'constraint': {0},
-            })
-    wave_function.propagate_constraints(boundary_conditions)
+        
+        # Left boundary acts rightwards
+        wave_function.apply_boundary_condition(
+            grid.get_boundary_points(tiles.Directions.LEFT),
+            tiles.Directions.RIGHT,
+            {0},
+        )
+        
+        # Right boundary acts leftwards
+        wave_function.apply_boundary_condition(
+            grid.get_boundary_points(tiles.Directions.RIGHT),
+            tiles.Directions.LEFT,
+            {0},
+        )
     
     
     print('Initial state')

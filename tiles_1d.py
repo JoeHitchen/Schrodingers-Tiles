@@ -2,6 +2,7 @@ from typing import List, Optional
 import random
 
 import tiles
+import grids
 
 NUM_CONN = 5
 GRID_SIZE = 10
@@ -71,6 +72,23 @@ if __name__ == '__main__':
         for i in range(GRID_SIZE)
     ])
     tiles.link_1d_grid(wave_function.cells, GRID_CYCLIC)
+    
+    grid = grids.Grid1D(GRID_SIZE)
+    if not GRID_CYCLIC:
+        
+        # Left boundary acts rightwards
+        wave_function.apply_boundary_condition(
+            grid.get_boundary_points(tiles.Directions.LEFT),
+            tiles.Directions.RIGHT,
+            {1},
+        )
+        
+        # Right boundary acts leftwards
+        wave_function.apply_boundary_condition(
+            grid.get_boundary_points(tiles.Directions.RIGHT),
+            tiles.Directions.LEFT,
+            {NUM_CONN},
+        )
     
     print('Initial state')
     render_1d_state(wave_function.cells, cyclic = GRID_CYCLIC)
