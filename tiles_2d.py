@@ -1,10 +1,10 @@
 import random
-import math
 
 import tiles
 
 
-GRID_SIZE = 16
+GRID_SIZE = (32, 8)
+GRID_CYCLIC = (True, False)
 
 light_corner = ['┘', '└', '┌', '┐']
 light_tshape = ['┴', '├', '┬', '┤']
@@ -47,8 +47,7 @@ def create_tiles_and_symbols(symbols, spec):
 
 
 def render_2d_state(cells):
-    num_rows = math.floor(len(cells) / GRID_SIZE)
-    rows = [cells[GRID_SIZE * i:GRID_SIZE * (i + 1)] for i in range(num_rows)]
+    rows = [cells[GRID_SIZE[0] * i:GRID_SIZE[0] * (i + 1)] for i in range(GRID_SIZE[1])]
     for row in rows:
         print(''.join(render_2d_tile(cell.tile) for cell in row))
 
@@ -92,8 +91,40 @@ if __name__ == '__main__':
     tile_set = [tile for tile, symbol in tiles_and_symbols]
     
     
-    wave_function = [tiles.Cell(id = str(i + 1), state = tile_set) for i in range(GRID_SIZE ** 2)]
-    tiles.link_rectangular_2d_grid(wave_function, GRID_SIZE)
+    wave_function = [
+        tiles.Cell(id = f'{i + 1}-{j + 1}', state = tile_set)
+        for i in range(GRID_SIZE[0]) for j in range(GRID_SIZE[1])
+    ]
+    tiles.link_2d_grid(wave_function, GRID_SIZE, GRID_CYCLIC)
+    
+    boundary_conditions = []
+    
+    if not GRID_CYCLIC[1]:
+        for i in range(GRID_SIZE[0]):
+            boundary_conditions.append({
+                'cell': wave_function[i],
+                'direction': tiles.Directions.DOWN,
+                'constraint': {0},
+            })
+            boundary_conditions.append({
+                'cell': wave_function[- i - 1],
+                'direction': tiles.Directions.UP,
+                'constraint': {0},
+            })
+    
+    if not GRID_CYCLIC[0]:
+        for j in range(GRID_SIZE[1]):
+            boundary_conditions.append({
+                'cell': wave_function[GRID_SIZE[0] * j],
+                'direction': tiles.Directions.RIGHT,
+                'constraint': {0},
+            })
+            boundary_conditions.append({
+                'cell': wave_function[GRID_SIZE[0] * (j + 1) - 1],
+                'direction': tiles.Directions.LEFT,
+                'constraint': {0},
+            })
+    tiles.propagate_constraints(wave_function, boundary_conditions)
     
     
     print('Initial state')

@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 from typing import List, Dict
 import random
-import math
 import enum
 
 GRID_SIZE = 9
@@ -24,25 +23,24 @@ def flip_direction(direction):
     }[direction]
 
 
-def link_bounded_1d_grid(cells, direction = Directions.RIGHT):
+def link_1d_grid(cells, cyclic = False, direction = Directions.RIGHT):
+    """Connects cells in one direction, with an optional cyclical loop."""
+    
     for index, cell in enumerate(cells[:-1]):
         cell.link_neighbour(cells[index + 1], direction)
-
-
-def link_cyclical_grid(cells):
-    link_bounded_1d_grid(cells)
-    cells[-1].link_neighbour(cells[0], Directions.RIGHT)
-
-
-def link_rectangular_2d_grid(cells, row_size):
-    num_rows = math.floor(len(cells) / row_size)
-    rows = [cells[row_size * i:row_size * (i + 1)] for i in range(num_rows)]
-
-    for row in rows:
-        link_bounded_1d_grid(row)
     
-    for i in range(row_size):
-        link_bounded_1d_grid(cells[i:row_size ** 2:row_size], Directions.DOWN)
+    if cyclic:
+        cells[-1].link_neighbour(cells[0], direction)
+
+
+def link_2d_grid(cells, grid_size, grid_cyclic):
+    """Connects cells horizontally and vertically, with optional cyclical loops."""
+    
+    for j in range(grid_size[1]):
+        link_1d_grid(cells[grid_size[0] * j:grid_size[0] * (j + 1)], grid_cyclic[0])
+    
+    for i in range(grid_size[0]):
+        link_1d_grid(cells[i::grid_size[0]], grid_cyclic[1], Directions.DOWN)
 
 
 Tile = Dict[Directions, int]
@@ -122,11 +120,17 @@ def collapse(wave_function, cell_index, tile):
         'constraint': wave_function[cell_index].connectors[direction],
     } for direction in wave_function[cell_index].neighbours]
     
-    while propagations:
-        propagation = propagations.pop(0)
-        cell = propagation.pop('cell')
-        further_propgations = cell.constrain(**propagation)
-        propagations.extend(further_propgations)
+    propagate_constraints(wave_function, propagations)
+
+
+def propagate_constraints(wave_function, constraints):
+    """Iteratively applies constraints to cells until a consistent state is reached."""
+    
+    while constraints:
+        constraint = constraints.pop(0)
+        cell = constraint.pop('cell')
+        further_constraints = cell.constrain(**constraint)
+        constraints.extend(further_constraints)
 
 
 def get_most_contrained_cell(wave_function):
