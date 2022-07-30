@@ -3,9 +3,6 @@ from typing import List, Tuple, Dict, TypedDict, Set, Optional
 import random
 import enum
 
-GRID_SIZE = 9
-GRID_CYCLIC = True
-
 
 class Directions(enum.Enum):
     LEFT = 'L'
