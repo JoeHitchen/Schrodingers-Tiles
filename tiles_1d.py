@@ -67,10 +67,7 @@ if __name__ == '__main__':
     
     tile_set = create_1d_incrementing_tiles(NUM_CONN, cyclic = GRID_CYCLIC)
     wave_function = [tiles.Cell(id = str(i + 1), state = tile_set) for i in range(GRID_SIZE)]
-    if GRID_CYCLIC:
-        tiles.link_cyclical_grid(wave_function)
-    else:
-        tiles.link_bounded_grid(wave_function)
+    tiles.link_1d_grid(wave_function, GRID_CYCLIC)
     
     print('Initial state')
     render_1d_state(wave_function, cyclic = GRID_CYCLIC)
