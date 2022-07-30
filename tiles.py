@@ -140,6 +140,10 @@ class Cell:
 class WaveFunction:
     cells: List[Cell]
     
+    @property
+    def collapsed(self) -> bool:
+        return all(cell.collapsed for cell in self.cells)
+    
     def get_most_contrained_cell(self) -> Cell:
         """Randomly selects a cell with the smallest possibility space remaining."""
         

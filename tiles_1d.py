@@ -75,7 +75,7 @@ if __name__ == '__main__':
     print('Initial state')
     render_1d_state(wave_function.cells, cyclic = GRID_CYCLIC)
     
-    while any([not cell.collapsed for cell in wave_function.cells]):
+    while not wave_function.collapsed:
         print('')
         print('Performing random collapse...')
         cell = wave_function.get_most_contrained_cell()
