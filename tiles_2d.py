@@ -97,7 +97,7 @@ if __name__ == '__main__':
     
     wave_function = [
         tiles.Cell(id = f'{i + 1}-{j + 1}', state = tile_set)
-        for i in range(GRID_SIZE[0]) for j in range(GRID_SIZE[1])
+        for j in range(GRID_SIZE[1]) for i in range(GRID_SIZE[0])
     ]
     tiles.link_2d_grid(wave_function, GRID_SIZE, GRID_CYCLIC)
     
