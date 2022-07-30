@@ -95,23 +95,23 @@ if __name__ == '__main__':
     tile_set = [tile for tile, symbol in tiles_and_symbols]
     
     
-    wave_function = [
+    wave_function = tiles.WaveFunction([
         tiles.Cell(id = f'{i + 1}-{j + 1}', state = tile_set)
         for j in range(GRID_SIZE[1]) for i in range(GRID_SIZE[0])
-    ]
-    tiles.link_2d_grid(wave_function, GRID_SIZE, GRID_CYCLIC)
+    ])
+    tiles.link_2d_grid(wave_function.cells, GRID_SIZE, GRID_CYCLIC)
     
     boundary_conditions: List[tiles.Propagation] = []
     
     if not GRID_CYCLIC[1]:
         for i in range(GRID_SIZE[0]):
             boundary_conditions.append({
-                'cell': wave_function[i],
+                'cell': wave_function.cells[i],
                 'direction': tiles.Directions.DOWN,
                 'constraint': {0},
             })
             boundary_conditions.append({
-                'cell': wave_function[- i - 1],
+                'cell': wave_function.cells[- i - 1],
                 'direction': tiles.Directions.UP,
                 'constraint': {0},
             })
@@ -119,30 +119,30 @@ if __name__ == '__main__':
     if not GRID_CYCLIC[0]:
         for j in range(GRID_SIZE[1]):
             boundary_conditions.append({
-                'cell': wave_function[GRID_SIZE[0] * j],
+                'cell': wave_function.cells[GRID_SIZE[0] * j],
                 'direction': tiles.Directions.RIGHT,
                 'constraint': {0},
             })
             boundary_conditions.append({
-                'cell': wave_function[GRID_SIZE[0] * (j + 1) - 1],
+                'cell': wave_function.cells[GRID_SIZE[0] * (j + 1) - 1],
                 'direction': tiles.Directions.LEFT,
                 'constraint': {0},
             })
-    tiles.propagate_constraints(wave_function, boundary_conditions)
+    wave_function.propagate_constraints(boundary_conditions)
     
     
     print('Initial state')
-    render_2d_state(wave_function)
+    render_2d_state(wave_function.cells)
     
-    while any([not cell.collapsed for cell in wave_function]):
+    while not wave_function.collapsed:
         print('')
         print('Performing random collapse...')
-        cell_index = tiles.get_most_contrained_cell(wave_function)
-        tile = random.choice(wave_function[cell_index].state)
-        print('Selected {} for {}'.format(render_2d_tile(tile), wave_function[cell_index]))
+        cell = wave_function.get_most_contrained_cell()
+        tile = random.choice(cell.state)
+        print('Selected {} for {}'.format(render_2d_tile(tile), cell))
         
-        tiles.collapse(wave_function, cell_index, tile)
-        render_2d_state(wave_function)
+        cell.tile = tile
+        render_2d_state(wave_function.cells)
     
     
 
