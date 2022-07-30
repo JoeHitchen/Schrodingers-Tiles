@@ -1,3 +1,4 @@
+from typing import List, Tuple, Optional
 import random
 
 import tiles
@@ -25,7 +26,10 @@ double_light_tshape = ['╧', '╟', '╤', '╢']
 double_light_cross = ['╪']
 
 
-def create_tiles_and_symbols(symbols, spec):
+def create_tiles_and_symbols(
+    symbols: List[str],
+    spec: Tuple[int, int, int, int],
+) -> List[Tuple[tiles.Tile, str]]:
     """Creates a set of tiles based on a set of symbols and a connection template."""
     
     tiles_and_symbols = [({
@@ -46,7 +50,7 @@ def create_tiles_and_symbols(symbols, spec):
     return tiles_and_symbols
 
 
-def render_2d_state(cells):
+def render_2d_state(cells: List[tiles.Cell]) -> None:
     rows = [cells[GRID_SIZE[0] * i:GRID_SIZE[0] * (i + 1)] for i in range(GRID_SIZE[1])]
     for row in rows:
         print(''.join(render_2d_tile(cell.tile) for cell in row))
@@ -55,7 +59,7 @@ def render_2d_state(cells):
 if __name__ == '__main__':
     
     tiles_and_symbols = [
-        *create_tiles_and_symbols(' ', (0, 0, 0, 0)),
+        *create_tiles_and_symbols([' '], (0, 0, 0, 0)),
         *create_tiles_and_symbols(light_corner, (1, 1, 0, 0)),
         *create_tiles_and_symbols(light_tshape, (1, 1, 1, 0)),
         *create_tiles_and_symbols(light_straight, (1, 0, 1, 0)),
@@ -72,9 +76,9 @@ if __name__ == '__main__':
         *create_tiles_and_symbols(double_light_cross, (2, 1, 2, 1)),
     ]
     
-    def tile_conn(tile):
+    def tile_conn(tile: Optional[tiles.Tile]) -> Optional[Tuple[int, int, int, int]]:
         if not tile:
-            return ()
+            return None
         return (
             tile[tiles.Directions.LEFT],
             tile[tiles.Directions.UP],
@@ -82,7 +86,7 @@ if __name__ == '__main__':
             tile[tiles.Directions.DOWN],
         )
     
-    def render_2d_tile(tile):
+    def render_2d_tile(tile: Optional[tiles.Tile]) -> str:
         return {
             tile_conn(map_tile): map_symbol
             for map_tile, map_symbol in tiles_and_symbols
@@ -97,7 +101,7 @@ if __name__ == '__main__':
     ]
     tiles.link_2d_grid(wave_function, GRID_SIZE, GRID_CYCLIC)
     
-    boundary_conditions = []
+    boundary_conditions: List[tiles.Propagation] = []
     
     if not GRID_CYCLIC[1]:
         for i in range(GRID_SIZE[0]):

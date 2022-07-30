@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Dict
+from typing import List, Tuple, Dict, TypedDict, Set, Optional
 import random
 import enum
 
@@ -14,7 +14,7 @@ class Directions(enum.Enum):
     DOWN = 'D'
 
 
-def flip_direction(direction):
+def flip_direction(direction: Directions) -> Directions:
     return {
         Directions.LEFT: Directions.RIGHT,
         Directions.UP: Directions.DOWN,
@@ -23,7 +23,11 @@ def flip_direction(direction):
     }[direction]
 
 
-def link_1d_grid(cells, cyclic = False, direction = Directions.RIGHT):
+def link_1d_grid(
+    cells: List['Cell'],
+    cyclic: bool = False,
+    direction: Directions = Directions.RIGHT,
+) -> None:
     """Connects cells in one direction, with an optional cyclical loop."""
     
     for index, cell in enumerate(cells[:-1]):
@@ -33,7 +37,11 @@ def link_1d_grid(cells, cyclic = False, direction = Directions.RIGHT):
         cells[-1].link_neighbour(cells[0], direction)
 
 
-def link_2d_grid(cells, grid_size, grid_cyclic):
+def link_2d_grid(
+    cells: List['Cell'],
+    grid_size: Tuple[int, int],
+    grid_cyclic: Tuple[bool, bool],
+) -> None:
     """Connects cells horizontally and vertically, with optional cyclical loops."""
     
     for j in range(grid_size[1]):
@@ -44,6 +52,12 @@ def link_2d_grid(cells, grid_size, grid_cyclic):
 
 
 Tile = Dict[Directions, int]
+
+
+class Propagation(TypedDict):
+    cell: 'Cell'
+    direction: Directions
+    constraint: Set[int]
 
 
 class PropagationError(Exception):
@@ -57,11 +71,11 @@ class Cell:
     state: List[Tile]
     neighbours: Dict[Directions, 'Cell'] = field(default_factory = dict)
     
-    def __str__(self):
+    def __str__(self) -> str:
         return f'Cell {self.id}'
     
     
-    def link_neighbour(self, neighbour, direction):
+    def link_neighbour(self, neighbour: 'Cell', direction: Directions) -> None:
         neighbour_direction = flip_direction(direction)
         assert direction not in self.neighbours and neighbour_direction not in neighbour.neighbours
         
@@ -70,25 +84,25 @@ class Cell:
         
     
     @property
-    def collapsed(self):
+    def collapsed(self) -> bool:
         return len(self.state) == 1
     
     @property
-    def tile(self):
+    def tile(self) -> Optional[Tile]:
         return self.state[0] if self.collapsed else None
     
     @tile.setter
-    def tile(self, tile):
+    def tile(self, tile: Tile) -> None:
         self.state = [tile]
     
     @property
-    def connectors(self):
+    def connectors(self) -> Dict[Directions, Set[int]]:
         return {
             direction: {tile[direction] for tile in self.state if direction in tile}
             for direction in Directions
         }
     
-    def constrain(self, direction, constraint):
+    def constrain(self, direction: Directions, constraint: Set[int]) -> List[Propagation]:
         
         original_connectors = self.connectors
         self.state = [
@@ -110,11 +124,11 @@ class Cell:
         ]
 
 
-def collapse(wave_function, cell_index, tile):
+def collapse(wave_function: List[Cell], cell_index: int, tile: Tile) -> None:
     
     wave_function[cell_index].tile = tile
     
-    propagations = [{
+    propagations: List[Propagation] = [{
         'cell': wave_function[cell_index].neighbours[direction],
         'direction': direction,
         'constraint': wave_function[cell_index].connectors[direction],
@@ -123,17 +137,17 @@ def collapse(wave_function, cell_index, tile):
     propagate_constraints(wave_function, propagations)
 
 
-def propagate_constraints(wave_function, constraints):
+def propagate_constraints(wave_function: List[Cell], propagations: List[Propagation]) -> None:
     """Iteratively applies constraints to cells until a consistent state is reached."""
     
-    while constraints:
-        constraint = constraints.pop(0)
-        cell = constraint.pop('cell')
-        further_constraints = cell.constrain(**constraint)
-        constraints.extend(further_constraints)
+    while propagations:
+        propagation = propagations.pop(0)
+        cell = propagation['cell']
+        further_propagations = cell.constrain(propagation['direction'], propagation['constraint'])
+        propagations.extend(further_propagations)
 
 
-def get_most_contrained_cell(wave_function):
+def get_most_contrained_cell(wave_function: List[Cell]) -> int:
     
     possibility_space = {
         cell_index: len(cell.state)

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 import random
 
 import tiles
@@ -28,7 +28,7 @@ def tile_to_text(tile: tiles.Tile) -> str:
 
 def render_1d_state(wave_function: List[tiles.Cell], cyclic: bool) -> None:
     
-    def render_1d_tile(tile: tiles.Tile, line: int) -> str:
+    def render_1d_tile(tile: Optional[tiles.Tile], line: int) -> str:
         left = tile[tiles.Directions.LEFT] if tile else '?'
         right = tile[tiles.Directions.RIGHT] if tile else '?'
         return {
