@@ -1,36 +1,8 @@
 from dataclasses import dataclass, field
-from typing import List, Tuple, Dict, TypedDict, Set, Optional
+from typing import List, Dict, TypedDict, Set, Optional
 import random
 
 import grids
-
-
-def link_1d_grid(
-    cells: List['Cell'],
-    cyclic: bool = False,
-    direction: grids.Direction = grids.Direction.RIGHT,
-) -> None:
-    """Connects cells in one direction, with an optional cyclical loop."""
-    
-    for index, cell in enumerate(cells[:-1]):
-        cell.link_neighbour(cells[index + 1], direction)
-    
-    if cyclic:
-        cells[-1].link_neighbour(cells[0], direction)
-
-
-def link_2d_grid(
-    cells: List['Cell'],
-    grid_size: Tuple[int, int],
-    grid_cyclic: Tuple[bool, bool],
-) -> None:
-    """Connects cells horizontally and vertically, with optional cyclical loops."""
-    
-    for j in range(grid_size[1]):
-        link_1d_grid(cells[grid_size[0] * j:grid_size[0] * (j + 1)], grid_cyclic[0])
-    
-    for i in range(grid_size[0]):
-        link_1d_grid(cells[i::grid_size[0]], grid_cyclic[1], grids.Direction.DOWN)
 
 
 Tile = Dict[grids.Direction, int]
@@ -118,10 +90,22 @@ class Cell:
         pass
 
 
-@dataclass
 class WaveFunction:
-    cells: List[Cell]
-    grid: grids.Grid
+    
+    def __init__(self, grid: grids.Grid, tile_set: List[Tile]):
+        self.grid = grid
+        self.cells = [Cell(
+            id = grid.make_cell_id(index),
+            state = tile_set,
+        ) for index in range(grid.size_total)]
+        
+        for cell_slice, direction, cyclic in self.grid.get_neighbour_slices():
+            neighbour_cells = self.cells[cell_slice]
+            for index, cell in enumerate(neighbour_cells[:-1]):
+                cell.link_neighbour(neighbour_cells[index + 1], direction)
+            if cyclic:
+                neighbour_cells[-1].link_neighbour(neighbour_cells[0], direction)
+    
     
     @property
     def collapsed(self) -> bool:

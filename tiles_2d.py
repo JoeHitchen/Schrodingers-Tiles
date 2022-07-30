@@ -93,15 +93,10 @@ if __name__ == '__main__':
             for map_tile, map_symbol in tiles_and_symbols
         }.get(tile_conn(tile), '?')
     
+    
+    grid = grids.Grid2D(*GRID_SIZE, *GRID_CYCLIC)
     tile_set = [tile for tile, symbol in tiles_and_symbols]
-    
-    
-    grid = grids.Grid2D(*GRID_SIZE)
-    wave_function = tiles.WaveFunction([
-        tiles.Cell(id = f'{i + 1}-{j + 1}', state = tile_set)
-        for j in range(GRID_SIZE[1]) for i in range(GRID_SIZE[0])
-    ], grid)
-    tiles.link_2d_grid(wave_function.cells, GRID_SIZE, GRID_CYCLIC)
+    wave_function = tiles.WaveFunction(grid, tile_set)
     
     if not GRID_CYCLIC[1]:
         wave_function.apply_boundary_constraint(grids.Direction.DOWN, {0})  # Upper boundary
