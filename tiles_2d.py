@@ -128,7 +128,7 @@ if __name__ == '__main__':
                 'direction': tiles.Directions.LEFT,
                 'constraint': {0},
             })
-    tiles.propagate_constraints(wave_function.cells, boundary_conditions)
+    wave_function.propagate_constraints(boundary_conditions)
     
     
     print('Initial state')
@@ -137,11 +137,11 @@ if __name__ == '__main__':
     while any([not cell.collapsed for cell in wave_function.cells]):
         print('')
         print('Performing random collapse...')
-        cell_index = tiles.get_most_contrained_cell(wave_function.cells)
-        tile = random.choice(wave_function.cells[cell_index].state)
-        print('Selected {} for {}'.format(render_2d_tile(tile), wave_function.cells[cell_index]))
+        cell = wave_function.get_most_contrained_cell()
+        tile = random.choice(cell.state)
+        print('Selected {} for {}'.format(render_2d_tile(tile), cell))
         
-        tiles.collapse(wave_function.cells, cell_index, tile)
+        cell.tile = tile
         render_2d_state(wave_function.cells)
     
     

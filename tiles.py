@@ -60,11 +60,6 @@ class Propagation(TypedDict):
     constraint: Set[int]
 
 
-class PropagationError(Exception):
-    """Used when the wave-function collapse reaches an internally inconsistent state."""
-    pass
-
-
 @dataclass
 class Cell:
     id: str
@@ -93,7 +88,15 @@ class Cell:
     
     @tile.setter
     def tile(self, tile: Tile) -> None:
+        """Forces a collapse of the current cell and triggers a propagation wave."""
         self.state = [tile]
+        
+        WaveFunction.propagate_constraints([{
+            'cell': self.neighbours[direction],
+            'direction': direction,
+            'constraint': self.connectors[direction],
+        } for direction in self.neighbours])
+    
     
     @property
     def connectors(self) -> Dict[Directions, Set[int]]:
@@ -102,16 +105,20 @@ class Cell:
             for direction in Directions
         }
     
+    
     def constrain(self, direction: Directions, constraint: Set[int]) -> List[Propagation]:
+        """Applies a constraint to the cell states and determines any onward propagations."""
         
+        # Apply new constraint
         original_connectors = self.connectors
         self.state = [
             tile for tile in self.state
             if tile[flip_direction(direction)] in constraint
         ]
         if not self.state:
-            raise PropagationError(f'{self} has no remaining state options')
+            raise self.ConstraintError(f'{self} has no remaining state options')
         
+        # Identify new onward constraints
         return [
             {
                 'cell': self.neighbours[onward_direction],
@@ -122,49 +129,44 @@ class Cell:
             if self.connectors[onward_direction] != original_connectors[onward_direction]
             and onward_direction != flip_direction(direction)
         ]
+    
+    
+    class ConstraintError(Exception):
+        """Used when a collapsed cell has no valid states remaining."""
+        pass
 
 
 @dataclass
 class WaveFunction:
     cells: List[Cell]
-
-
-def collapse(wave_function: List[Cell], cell_index: int, tile: Tile) -> None:
     
-    wave_function[cell_index].tile = tile
+    def get_most_contrained_cell(self) -> Cell:
+        """Randomly selects a cell with the smallest possibility space remaining."""
+        
+        possibility_space = {
+            cell_index: len(cell.state)
+            for cell_index, cell
+            in enumerate(self.cells)
+            if not cell.collapsed  # Ignore already collapsed cells
+        }
+        most_constrained_size = min(possibility_space.values())
+        possibility_space = {
+            cell_index: size
+            for cell_index, size in possibility_space.items()
+            if size == most_constrained_size
+        }
+        return self.cells[random.choice(list(possibility_space.keys()))]
     
-    propagations: List[Propagation] = [{
-        'cell': wave_function[cell_index].neighbours[direction],
-        'direction': direction,
-        'constraint': wave_function[cell_index].connectors[direction],
-    } for direction in wave_function[cell_index].neighbours]
     
-    propagate_constraints(wave_function, propagations)
-
-
-def propagate_constraints(wave_function: List[Cell], propagations: List[Propagation]) -> None:
-    """Iteratively applies constraints to cells until a consistent state is reached."""
-    
-    while propagations:
-        propagation = propagations.pop(0)
-        cell = propagation['cell']
-        further_propagations = cell.constrain(propagation['direction'], propagation['constraint'])
-        propagations.extend(further_propagations)
-
-
-def get_most_contrained_cell(wave_function: List[Cell]) -> int:
-    
-    possibility_space = {
-        cell_index: len(cell.state)
-        for cell_index, cell
-        in enumerate(wave_function)
-        if not cell.collapsed  # Ignore already collapsed cells
-    }
-    most_constrained_size = min(possibility_space.values())
-    possibility_space = {
-        cell_index: size
-        for cell_index, size in possibility_space.items()
-        if size == most_constrained_size
-    }
-    return random.choice(list(possibility_space.keys()))
+    @staticmethod
+    def propagate_constraints(propagations: List[Propagation]) -> None:
+        """Iteratively applies constraints to cells until a consistent state is reached."""
+        
+        while propagations:
+            propagation = propagations.pop(0)
+            further_propagations = propagation['cell'].constrain(
+                propagation['direction'],
+                propagation['constraint'],
+            )
+            propagations.extend(further_propagations)
 
