@@ -1,3 +1,4 @@
+from typing import Protocol
 import enum
 
 
@@ -19,13 +20,19 @@ def flip_direction(direction: Direction) -> Direction:
     }[direction]
 
 
+class Grid(Protocol):
+    
+    def get_boundary_slice(self, direction: Direction) -> slice:
+        pass
+
+
 class Grid1D():
     
     def __init__(self, size_x: int) -> None:
         self.size_x = size_x
     
     
-    def get_boundary_points(self, direction: Direction) -> slice:
+    def get_boundary_slice(self, direction: Direction) -> slice:
         return {
             Direction.LEFT: slice(0, 1),
             Direction.RIGHT: slice(self.size_x - 1, self.size_x),
@@ -40,7 +47,7 @@ class Grid2D():
         self.size_total = size_x * size_y
     
     
-    def get_boundary_points(self, direction: Direction) -> slice:
+    def get_boundary_slice(self, direction: Direction) -> slice:
         return {
             Direction.LEFT: slice(0, self.size_total, self.size_x),
             Direction.UP: slice(0, self.size_x),

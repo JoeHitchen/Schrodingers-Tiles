@@ -96,45 +96,20 @@ if __name__ == '__main__':
     tile_set = [tile for tile, symbol in tiles_and_symbols]
     
     
+    grid = grids.Grid2D(*GRID_SIZE)
     wave_function = tiles.WaveFunction([
         tiles.Cell(id = f'{i + 1}-{j + 1}', state = tile_set)
         for j in range(GRID_SIZE[1]) for i in range(GRID_SIZE[0])
-    ])
+    ], grid)
     tiles.link_2d_grid(wave_function.cells, GRID_SIZE, GRID_CYCLIC)
     
-    grid = grids.Grid2D(*GRID_SIZE)
-    
     if not GRID_CYCLIC[1]:
-        
-        # Upper boundary acts downwards
-        wave_function.apply_boundary_condition(
-            grid.get_boundary_points(grids.Direction.UP),
-            grids.Direction.DOWN,
-            {0},
-        )
-        
-        # Lower boundary acts upwards
-        wave_function.apply_boundary_condition(
-            grid.get_boundary_points(grids.Direction.DOWN),
-            grids.Direction.UP,
-            {0},
-        )
+        wave_function.apply_boundary_constraint(grids.Direction.DOWN, {0})  # Upper boundary
+        wave_function.apply_boundary_constraint(grids.Direction.UP, {0})  # Lower boundary
     
     if not GRID_CYCLIC[0]:
-        
-        # Left boundary acts rightwards
-        wave_function.apply_boundary_condition(
-            grid.get_boundary_points(grids.Direction.LEFT),
-            grids.Direction.RIGHT,
-            {0},
-        )
-        
-        # Right boundary acts leftwards
-        wave_function.apply_boundary_condition(
-            grid.get_boundary_points(grids.Direction.RIGHT),
-            grids.Direction.LEFT,
-            {0},
-        )
+        wave_function.apply_boundary_constraint(grids.Direction.RIGHT, {0})  # Left boundary
+        wave_function.apply_boundary_constraint(grids.Direction.LEFT, {0})  # Right boundary
     
     
     print('Initial state')

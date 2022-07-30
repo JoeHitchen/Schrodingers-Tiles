@@ -121,6 +121,7 @@ class Cell:
 @dataclass
 class WaveFunction:
     cells: List[Cell]
+    grid: grids.Grid
     
     @property
     def collapsed(self) -> bool:
@@ -144,12 +145,14 @@ class WaveFunction:
         return self.cells[random.choice(list(possibility_space.keys()))]
     
     
-    def apply_boundary_condition(
-        self,
-        cell_slice: slice,
-        direction: grids.Direction,
-        constraint: Set[int],
-    ) -> None:
+    def apply_boundary_constraint(self, direction: grids.Direction, constraint: Set[int]) -> None:
+        """Applies the constraint given in the specified direction and propagates it as needed.
+        
+        N.B. The direction is the direction _the constraint acts in_, not the direction of the
+        boundary relative to the grid.
+        """
+        
+        cell_slice = self.grid.get_boundary_slice(grids.flip_direction(direction))
         
         self.propagate_constraints([{
             'cell': cell, 'direction': direction, 'constraint': constraint,

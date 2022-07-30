@@ -67,28 +67,17 @@ def render_1d_state(wave_function: List[tiles.Cell], cyclic: bool) -> None:
 if __name__ == '__main__':
     
     tile_set = create_1d_incrementing_tiles(NUM_CONN, cyclic = GRID_CYCLIC)
+    
+    grid = grids.Grid1D(GRID_SIZE)
     wave_function = tiles.WaveFunction([
         tiles.Cell(id = str(i + 1), state = tile_set)
         for i in range(GRID_SIZE)
-    ])
+    ], grid)
     tiles.link_1d_grid(wave_function.cells, GRID_CYCLIC)
     
-    grid = grids.Grid1D(GRID_SIZE)
     if not GRID_CYCLIC:
-        
-        # Left boundary acts rightwards
-        wave_function.apply_boundary_condition(
-            grid.get_boundary_points(grids.Direction.LEFT),
-            grids.Direction.RIGHT,
-            {1},
-        )
-        
-        # Right boundary acts leftwards
-        wave_function.apply_boundary_condition(
-            grid.get_boundary_points(grids.Direction.RIGHT),
-            grids.Direction.LEFT,
-            {NUM_CONN},
-        )
+        wave_function.apply_boundary_constraint(grids.Direction.RIGHT, {1})  # Left boundary
+        wave_function.apply_boundary_constraint(grids.Direction.LEFT, {NUM_CONN})  # Right boundary
     
     print('Initial state')
     render_1d_state(wave_function.cells, cyclic = GRID_CYCLIC)
