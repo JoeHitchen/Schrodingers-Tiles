@@ -124,6 +124,11 @@ class Cell:
         ]
 
 
+@dataclass
+class WaveFunction:
+    cells: List[Cell]
+
+
 def collapse(wave_function: List[Cell], cell_index: int, tile: Tile) -> None:
     
     wave_function[cell_index].tile = tile
