@@ -1,4 +1,4 @@
-from typing import Tuple, Optional
+from typing import Optional
 
 from tile_sets import Tile, ascii_box_tiles
 import wave_functions
@@ -22,18 +22,6 @@ class CliRunner2D(cli.CliRunner):
         ]
         for row in rows:
             print(''.join(self.inline_tile_string(cell.tile) for cell in row))
-    
-    
-    @staticmethod
-    def _tile_spec(tile: Optional[Tile]) -> Optional[Tuple[int, int, int, int]]:
-        if not tile:
-            return None
-        return (
-            tile.connectors[grids.Direction.LEFT],
-            tile.connectors[grids.Direction.UP],
-            tile.connectors[grids.Direction.RIGHT],
-            tile.connectors[grids.Direction.DOWN],
-        )
         
 
 if __name__ == '__main__':
