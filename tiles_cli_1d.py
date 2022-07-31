@@ -1,37 +1,9 @@
-from typing import List, Optional, cast
+from typing import Optional, cast
 
-from tile_sets import Tile, Connector
+from tile_sets import Tile, Connector, sequential_dominoes
 import wave_functions
 import grids
 import cli
-
-
-def create_1d_incrementing_tiles(num_conn: int, cyclic: bool = False) -> List[Tile]:
-    """Creates a set of 1D tiles that increments through the connections and (optionally) loops."""
-    
-    tile_set = []
-    for i in range(1, num_conn + 1):
-        
-        c1 = cast(Connector, 1)
-        ci = cast(Connector, i)
-        cn = cast(Connector, i + 1)
-        
-        tile_set.append(Tile(
-            f'{ci}{ci}',
-            {grids.Direction.LEFT: ci, grids.Direction.RIGHT: ci}),
-        )
-        if i < num_conn:
-            tile_set.append(Tile(
-                f'{ci}{cn}',
-                {grids.Direction.LEFT: ci, grids.Direction.RIGHT: cn},
-            ))
-        elif cyclic and i > 1:
-            tile_set.append(Tile(
-                f'{ci}{c1}',
-                {grids.Direction.LEFT: ci, grids.Direction.RIGHT: c1},
-            ))
-    
-    return tile_set
 
 
 class CliRunner1D(cli.CliRunner):
@@ -89,7 +61,7 @@ if __name__ == '__main__':
     
     # Execution
     grid = grids.Grid1D(GRID_SIZE, GRID_CYCLIC)
-    tile_set = create_1d_incrementing_tiles(NUM_CONN, cyclic = GRID_CYCLIC)
+    tile_set = sequential_dominoes(NUM_CONN, cyclic = GRID_CYCLIC)
     wave_function = wave_functions.WaveFunction(grid, tile_set)
     
     if not GRID_CYCLIC:
