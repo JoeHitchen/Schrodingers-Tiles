@@ -1,5 +1,5 @@
 """Describes a set of ASCII box-art tiles that can be single or double ruled."""
-from typing import List, Tuple, cast
+from typing import List, Tuple
 
 import grids
 
@@ -37,9 +37,9 @@ def _generate_tiles_from_spec(
 def create() -> Tuple[List[Connector], List[Tile]]:
     
     # Define connectors
-    c0 = cast(Connector, 0)
-    c1 = cast(Connector, 1)
-    c2 = cast(Connector, 2)
+    c0 = Connector('0')
+    c1 = Connector('1')
+    c2 = Connector('2')
     connectors = [c0, c1, c2]
     
     # Define tile specs
