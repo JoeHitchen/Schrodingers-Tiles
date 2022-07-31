@@ -1,17 +1,17 @@
 from typing import List, Tuple, Optional
 
-import tiles
+import wave_functions
 import grids
 import cli
 
 
-def create_2d_ascii_box_tiles_and_symbols() -> List[Tuple[tiles.Tile, str]]:
+def create_2d_ascii_box_tiles_and_symbols() -> List[Tuple[wave_functions.Tile, str]]:
     """Creates a set of ASCII box-art tiles that can be single or double ruled."""
     
     def _generate_tiles_and_symbols(
         spec: Tuple[int, int, int, int],
         symbols: List[str],
-    ) -> List[Tuple[tiles.Tile, str]]:
+    ) -> List[Tuple[wave_functions.Tile, str]]:
         """Creates a set of tiles based on a set of symbols and a connection template."""
         
         tiles_and_symbols = [({
@@ -53,7 +53,7 @@ def create_2d_ascii_box_tiles_and_symbols() -> List[Tuple[tiles.Tile, str]]:
 
 class CliRunner2D(cli.CliRunner):
     
-    def __init__(self, wave_function: tiles.WaveFunction) -> None:
+    def __init__(self, wave_function: wave_functions.WaveFunction) -> None:
         super().__init__(wave_function)
         
         self.tile_symbol_map = {
@@ -62,7 +62,7 @@ class CliRunner2D(cli.CliRunner):
         }
     
     
-    def inline_tile_string(self, tile: Optional[tiles.Tile]) -> str:
+    def inline_tile_string(self, tile: Optional[wave_functions.Tile]) -> str:
         return self.tile_symbol_map.get(self._tile_spec(tile), '?')
     
     
@@ -78,7 +78,7 @@ class CliRunner2D(cli.CliRunner):
     
     
     @staticmethod
-    def _tile_spec(tile: Optional[tiles.Tile]) -> Optional[Tuple[int, int, int, int]]:
+    def _tile_spec(tile: Optional[wave_functions.Tile]) -> Optional[Tuple[int, int, int, int]]:
         if not tile:
             return None
         return (
@@ -99,7 +99,7 @@ if __name__ == '__main__':
     # Execution
     grid = grids.Grid2D(*GRID_SIZE, *GRID_CYCLIC)
     tile_set = [tile for tile, symbol in create_2d_ascii_box_tiles_and_symbols()]
-    wave_function = tiles.WaveFunction(grid, tile_set)
+    wave_function = wave_functions.WaveFunction(grid, tile_set)
     
     if not GRID_CYCLIC[1]:
         wave_function.apply_boundary_constraint(grids.Direction.DOWN, {0})  # Upper boundary

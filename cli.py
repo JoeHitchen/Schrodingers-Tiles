@@ -1,17 +1,17 @@
 import random
 
-import tiles
+import wave_functions
 
 
 class CliRunner():
     
-    def __init__(self, wave_function: tiles.WaveFunction):
+    def __init__(self, wave_function: wave_functions.WaveFunction):
         self.wave_function = wave_function
     
     def render_state(self) -> None:
         pass
     
-    def inline_tile_string(self, tile: tiles.Tile) -> str:
+    def inline_tile_string(self, tile: wave_functions.Tile) -> str:
         pass
     
     def run(self) -> None:

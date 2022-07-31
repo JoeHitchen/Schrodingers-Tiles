@@ -1,11 +1,11 @@
 from typing import List, Optional
 
-import tiles
+import wave_functions
 import grids
 import cli
 
 
-def create_1d_incrementing_tiles(num_conn: int, cyclic: bool = False) -> List[tiles.Tile]:
+def create_1d_incrementing_tiles(num_conn: int, cyclic: bool = False) -> List[wave_functions.Tile]:
     """Creates a set of 1D tiles that increments through the connections and (optionally) loops."""
     
     tile_set = []
@@ -21,7 +21,7 @@ def create_1d_incrementing_tiles(num_conn: int, cyclic: bool = False) -> List[ti
 
 class CliRunner1D(cli.CliRunner):
     
-    def inline_tile_string(self, tile: tiles.Tile) -> str:
+    def inline_tile_string(self, tile: wave_functions.Tile) -> str:
         return f'[{tile[grids.Direction.LEFT]}-{tile[grids.Direction.RIGHT]}]'
     
     def render_state(self) -> None:
@@ -56,7 +56,7 @@ class CliRunner1D(cli.CliRunner):
     
     
     @staticmethod
-    def _render_tile(tile: Optional[tiles.Tile], line: int) -> str:
+    def _render_tile(tile: Optional[wave_functions.Tile], line: int) -> str:
         left = tile[grids.Direction.LEFT] if tile else '?'
         right = tile[grids.Direction.RIGHT] if tile else '?'
         return {
@@ -76,7 +76,7 @@ if __name__ == '__main__':
     # Execution
     grid = grids.Grid1D(GRID_SIZE, GRID_CYCLIC)
     tile_set = create_1d_incrementing_tiles(NUM_CONN, cyclic = GRID_CYCLIC)
-    wave_function = tiles.WaveFunction(grid, tile_set)
+    wave_function = wave_functions.WaveFunction(grid, tile_set)
     
     if not GRID_CYCLIC:
         wave_function.apply_boundary_constraint(grids.Direction.RIGHT, {1})  # Left boundary
