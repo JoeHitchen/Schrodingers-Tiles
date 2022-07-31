@@ -1,28 +1,32 @@
 from typing import List, Optional
 
+from tile_sets import Tile
 import wave_functions
 import grids
 import cli
 
 
-def create_1d_incrementing_tiles(num_conn: int, cyclic: bool = False) -> List[wave_functions.Tile]:
+def create_1d_incrementing_tiles(num_conn: int, cyclic: bool = False) -> List[Tile]:
     """Creates a set of 1D tiles that increments through the connections and (optionally) loops."""
     
     tile_set = []
     for i in range(1, num_conn + 1):
-        tile_set.append({grids.Direction.LEFT: i, grids.Direction.RIGHT: i})
+        tile_set.append(Tile({grids.Direction.LEFT: i, grids.Direction.RIGHT: i}))
         if i < num_conn:
-            tile_set.append({grids.Direction.LEFT: i, grids.Direction.RIGHT: i + 1})
+            tile_set.append(Tile({grids.Direction.LEFT: i, grids.Direction.RIGHT: i + 1}))
         elif cyclic and i > 1:
-            tile_set.append({grids.Direction.LEFT: i, grids.Direction.RIGHT: 1})
+            tile_set.append(Tile({grids.Direction.LEFT: i, grids.Direction.RIGHT: 1}))
     
     return tile_set
 
 
 class CliRunner1D(cli.CliRunner):
     
-    def inline_tile_string(self, tile: wave_functions.Tile) -> str:
-        return f'[{tile[grids.Direction.LEFT]}-{tile[grids.Direction.RIGHT]}]'
+    def inline_tile_string(self, tile: Tile) -> str:
+        return '[{}-{}]'.format(
+            tile.connectors[grids.Direction.LEFT],
+            tile.connectors[grids.Direction.RIGHT],
+        )
     
     def render_state(self) -> None:
         
@@ -56,9 +60,9 @@ class CliRunner1D(cli.CliRunner):
     
     
     @staticmethod
-    def _render_tile(tile: Optional[wave_functions.Tile], line: int) -> str:
-        left = tile[grids.Direction.LEFT] if tile else '?'
-        right = tile[grids.Direction.RIGHT] if tile else '?'
+    def _render_tile(tile: Optional[Tile], line: int) -> str:
+        left = tile.connectors[grids.Direction.LEFT] if tile else '?'
+        right = tile.connectors[grids.Direction.RIGHT] if tile else '?'
         return {
             0: '╔══╗',
             1: '║{}{}║'.format(left, right),

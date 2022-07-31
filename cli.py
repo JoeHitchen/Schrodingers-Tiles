@@ -1,5 +1,6 @@
 import random
 
+from tile_sets import Tile
 import wave_functions
 
 
@@ -11,7 +12,7 @@ class CliRunner():
     def render_state(self) -> None:
         pass
     
-    def inline_tile_string(self, tile: wave_functions.Tile) -> str:
+    def inline_tile_string(self, tile: Tile) -> str:
         pass
     
     def run(self) -> None:

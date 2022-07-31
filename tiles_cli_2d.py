@@ -1,33 +1,34 @@
 from typing import List, Tuple, Optional
 
+from tile_sets import Tile
 import wave_functions
 import grids
 import cli
 
 
-def create_2d_ascii_box_tiles_and_symbols() -> List[Tuple[wave_functions.Tile, str]]:
+def create_2d_ascii_box_tiles_and_symbols() -> List[Tuple[Tile, str]]:
     """Creates a set of ASCII box-art tiles that can be single or double ruled."""
     
     def _generate_tiles_and_symbols(
         spec: Tuple[int, int, int, int],
         symbols: List[str],
-    ) -> List[Tuple[wave_functions.Tile, str]]:
+    ) -> List[Tuple[Tile, str]]:
         """Creates a set of tiles based on a set of symbols and a connection template."""
         
-        tiles_and_symbols = [({
+        tiles_and_symbols = [(Tile({
             grids.Direction.LEFT: spec[0],
             grids.Direction.UP: spec[1],
             grids.Direction.RIGHT: spec[2],
             grids.Direction.DOWN: spec[3],
-        }, symbols[0])]
+        }), symbols[0])]
         
         for symbol in symbols[1:]:
-            tiles_and_symbols.append(({
-                grids.Direction.LEFT: tiles_and_symbols[-1][0][grids.Direction.DOWN],
-                grids.Direction.UP: tiles_and_symbols[-1][0][grids.Direction.LEFT],
-                grids.Direction.RIGHT: tiles_and_symbols[-1][0][grids.Direction.UP],
-                grids.Direction.DOWN: tiles_and_symbols[-1][0][grids.Direction.RIGHT],
-            }, symbol))
+            tiles_and_symbols.append((Tile({
+                grids.Direction.LEFT: tiles_and_symbols[-1][0].connectors[grids.Direction.DOWN],
+                grids.Direction.UP: tiles_and_symbols[-1][0].connectors[grids.Direction.LEFT],
+                grids.Direction.RIGHT: tiles_and_symbols[-1][0].connectors[grids.Direction.UP],
+                grids.Direction.DOWN: tiles_and_symbols[-1][0].connectors[grids.Direction.RIGHT],
+            }), symbol))
         
         return tiles_and_symbols
     
@@ -62,7 +63,7 @@ class CliRunner2D(cli.CliRunner):
         }
     
     
-    def inline_tile_string(self, tile: Optional[wave_functions.Tile]) -> str:
+    def inline_tile_string(self, tile: Optional[Tile]) -> str:
         return self.tile_symbol_map.get(self._tile_spec(tile), '?')
     
     
@@ -78,14 +79,14 @@ class CliRunner2D(cli.CliRunner):
     
     
     @staticmethod
-    def _tile_spec(tile: Optional[wave_functions.Tile]) -> Optional[Tuple[int, int, int, int]]:
+    def _tile_spec(tile: Optional[Tile]) -> Optional[Tuple[int, int, int, int]]:
         if not tile:
             return None
         return (
-            tile[grids.Direction.LEFT],
-            tile[grids.Direction.UP],
-            tile[grids.Direction.RIGHT],
-            tile[grids.Direction.DOWN],
+            tile.connectors[grids.Direction.LEFT],
+            tile.connectors[grids.Direction.UP],
+            tile.connectors[grids.Direction.RIGHT],
+            tile.connectors[grids.Direction.DOWN],
         )
         
 

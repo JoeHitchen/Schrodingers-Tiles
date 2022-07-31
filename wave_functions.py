@@ -3,9 +3,7 @@ from typing import List, Dict, TypedDict, Set, Optional
 import random
 
 import grids
-
-
-Tile = Dict[grids.Direction, int]
+from tile_sets import Tile
 
 
 class Propagation(TypedDict):
@@ -55,7 +53,11 @@ class Cell:
     @property
     def connectors(self) -> Dict[grids.Direction, Set[int]]:
         return {
-            direction: {tile[direction] for tile in self.state if direction in tile}
+            direction: {
+                tile.connectors[direction]
+                for tile in self.state
+                if direction in tile.connectors
+            }
             for direction in grids.Direction
         }
     
@@ -67,7 +69,7 @@ class Cell:
         original_connectors = self.connectors
         self.state = [
             tile for tile in self.state
-            if tile[grids.flip_direction(direction)] in constraint
+            if tile.connectors[grids.flip_direction(direction)] in constraint
         ]
         if not self.state:
             raise self.ConstraintError(f'{self} has no remaining state options')
