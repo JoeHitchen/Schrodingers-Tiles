@@ -3,13 +3,13 @@ from typing import List, Dict, TypedDict, Set, Optional
 import random
 
 import grids
-from tile_sets import Tile
+from tile_sets import Tile, Connector
 
 
 class Propagation(TypedDict):
     cell: 'Cell'
     direction: grids.Direction
-    constraint: Set[int]
+    constraint: Set[Connector]
 
 
 @dataclass
@@ -51,7 +51,7 @@ class Cell:
     
     
     @property
-    def connectors(self) -> Dict[grids.Direction, Set[int]]:
+    def connectors(self) -> Dict[grids.Direction, Set[Connector]]:
         return {
             direction: {
                 tile.connectors[direction]
@@ -62,7 +62,11 @@ class Cell:
         }
     
     
-    def constrain(self, direction: grids.Direction, constraint: Set[int]) -> List[Propagation]:
+    def constrain(
+        self,
+        direction: grids.Direction,
+        constraint: Set[Connector],
+    ) -> List[Propagation]:
         """Applies a constraint to the cell states and determines any onward propagations."""
         
         # Apply new constraint
@@ -131,7 +135,11 @@ class WaveFunction:
         return self.cells[random.choice(list(possibility_space.keys()))]
     
     
-    def apply_boundary_constraint(self, direction: grids.Direction, constraint: Set[int]) -> None:
+    def apply_boundary_constraint(
+        self,
+        direction: grids.Direction,
+        constraint: Set[Connector],
+    ) -> None:
         """Applies the constraint given in the specified direction and propagates it as needed.
         
         N.B. The direction is the direction _the constraint acts in_, not the direction of the

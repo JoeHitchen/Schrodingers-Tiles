@@ -1,6 +1,6 @@
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, cast
 
-from tile_sets import Tile
+from tile_sets import Tile, Connector
 import wave_functions
 import grids
 import cli
@@ -10,7 +10,7 @@ def create_2d_ascii_box_tiles_and_symbols() -> List[Tuple[Tile, str]]:
     """Creates a set of ASCII box-art tiles that can be single or double ruled."""
     
     def _generate_tiles_and_symbols(
-        spec: Tuple[int, int, int, int],
+        spec: Tuple[Connector, Connector, Connector, Connector],
         symbols: List[str],
     ) -> List[Tuple[Tile, str]]:
         """Creates a set of tiles based on a set of symbols and a connection template."""
@@ -32,23 +32,26 @@ def create_2d_ascii_box_tiles_and_symbols() -> List[Tuple[Tile, str]]:
         
         return tiles_and_symbols
     
+    c0 = cast(Connector, 0)
+    c1 = cast(Connector, 1)
+    c2 = cast(Connector, 2)
     
     return [
-        *_generate_tiles_and_symbols((0, 0, 0, 0), [' ']),
-        *_generate_tiles_and_symbols((1, 1, 0, 0), ['┘', '└', '┌', '┐']),
-        *_generate_tiles_and_symbols((1, 1, 1, 0), ['┴', '├', '┬', '┤']),
-        *_generate_tiles_and_symbols((1, 0, 1, 0), ['─', '│']),
-        *_generate_tiles_and_symbols((1, 1, 1, 1), ['┼']),
-        *_generate_tiles_and_symbols((2, 2, 0, 0), ['╝', '╚', '╔', '╗']),
-        *_generate_tiles_and_symbols((2, 2, 2, 0), ['╩', '╠', '╦', '╣']),
-        *_generate_tiles_and_symbols((2, 0, 2, 0), ['═', '║']),
-        *_generate_tiles_and_symbols((2, 2, 2, 2), ['╬']),
-        *_generate_tiles_and_symbols((1, 2, 0, 0), ['╜', '╘', '╓', '╕']),
-        *_generate_tiles_and_symbols((1, 2, 1, 0), ['╨', '╞', '╥', '╡']),
-        *_generate_tiles_and_symbols((1, 2, 1, 2), ['╫']),
-        *_generate_tiles_and_symbols((2, 1, 0, 0), ['╛', '╙', '╒', '╖']),
-        *_generate_tiles_and_symbols((2, 1, 2, 0), ['╧', '╟', '╤', '╢']),
-        *_generate_tiles_and_symbols((2, 1, 2, 1), ['╪']),
+        *_generate_tiles_and_symbols((c0, c0, c0, c0), [' ']),
+        *_generate_tiles_and_symbols((c1, c1, c0, c0), ['┘', '└', '┌', '┐']),
+        *_generate_tiles_and_symbols((c1, c1, c1, c0), ['┴', '├', '┬', '┤']),
+        *_generate_tiles_and_symbols((c1, c0, c1, c0), ['─', '│']),
+        *_generate_tiles_and_symbols((c1, c1, c1, c1), ['┼']),
+        *_generate_tiles_and_symbols((c2, c2, c0, c0), ['╝', '╚', '╔', '╗']),
+        *_generate_tiles_and_symbols((c2, c2, c2, c0), ['╩', '╠', '╦', '╣']),
+        *_generate_tiles_and_symbols((c2, c0, c2, c0), ['═', '║']),
+        *_generate_tiles_and_symbols((c2, c2, c2, c2), ['╬']),
+        *_generate_tiles_and_symbols((c1, c2, c0, c0), ['╜', '╘', '╓', '╕']),
+        *_generate_tiles_and_symbols((c1, c2, c1, c0), ['╨', '╞', '╥', '╡']),
+        *_generate_tiles_and_symbols((c1, c2, c1, c2), ['╫']),
+        *_generate_tiles_and_symbols((c2, c1, c0, c0), ['╛', '╙', '╒', '╖']),
+        *_generate_tiles_and_symbols((c2, c1, c2, c0), ['╧', '╟', '╤', '╢']),
+        *_generate_tiles_and_symbols((c2, c1, c2, c1), ['╪']),
     ]
 
 
@@ -102,13 +105,14 @@ if __name__ == '__main__':
     tile_set = [tile for tile, symbol in create_2d_ascii_box_tiles_and_symbols()]
     wave_function = wave_functions.WaveFunction(grid, tile_set)
     
+    c0 = cast(Connector, 0)
     if not GRID_CYCLIC[1]:
-        wave_function.apply_boundary_constraint(grids.Direction.DOWN, {0})  # Upper boundary
-        wave_function.apply_boundary_constraint(grids.Direction.UP, {0})  # Lower boundary
+        wave_function.apply_boundary_constraint(grids.Direction.DOWN, {c0})  # Upper boundary
+        wave_function.apply_boundary_constraint(grids.Direction.UP, {c0})  # Lower boundary
     
     if not GRID_CYCLIC[0]:
-        wave_function.apply_boundary_constraint(grids.Direction.RIGHT, {0})  # Left boundary
-        wave_function.apply_boundary_constraint(grids.Direction.LEFT, {0})  # Right boundary
+        wave_function.apply_boundary_constraint(grids.Direction.RIGHT, {c0})  # Left boundary
+        wave_function.apply_boundary_constraint(grids.Direction.LEFT, {c0})  # Right boundary
     
     CliRunner2D(wave_function).run()
 

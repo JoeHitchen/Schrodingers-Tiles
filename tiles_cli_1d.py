@@ -1,6 +1,6 @@
-from typing import List, Optional
+from typing import List, Optional, cast
 
-from tile_sets import Tile
+from tile_sets import Tile, Connector
 import wave_functions
 import grids
 import cli
@@ -11,11 +11,16 @@ def create_1d_incrementing_tiles(num_conn: int, cyclic: bool = False) -> List[Ti
     
     tile_set = []
     for i in range(1, num_conn + 1):
-        tile_set.append(Tile({grids.Direction.LEFT: i, grids.Direction.RIGHT: i}))
+        
+        c1 = cast(Connector, 1)
+        ci = cast(Connector, i)
+        cn = cast(Connector, i + 1)
+        
+        tile_set.append(Tile({grids.Direction.LEFT: ci, grids.Direction.RIGHT: ci}))
         if i < num_conn:
-            tile_set.append(Tile({grids.Direction.LEFT: i, grids.Direction.RIGHT: i + 1}))
+            tile_set.append(Tile({grids.Direction.LEFT: ci, grids.Direction.RIGHT: cn}))
         elif cyclic and i > 1:
-            tile_set.append(Tile({grids.Direction.LEFT: i, grids.Direction.RIGHT: 1}))
+            tile_set.append(Tile({grids.Direction.LEFT: ci, grids.Direction.RIGHT: c1}))
     
     return tile_set
 
@@ -83,8 +88,10 @@ if __name__ == '__main__':
     wave_function = wave_functions.WaveFunction(grid, tile_set)
     
     if not GRID_CYCLIC:
-        wave_function.apply_boundary_constraint(grids.Direction.RIGHT, {1})  # Left boundary
-        wave_function.apply_boundary_constraint(grids.Direction.LEFT, {NUM_CONN})  # Right boundary
+        c1 = cast(Connector, 1)
+        cn = cast(Connector, NUM_CONN)
+        wave_function.apply_boundary_constraint(grids.Direction.RIGHT, {c1})  # Left boundary
+        wave_function.apply_boundary_constraint(grids.Direction.LEFT, {cn})  # Right boundary
     
     CliRunner1D(wave_function).run()
 
