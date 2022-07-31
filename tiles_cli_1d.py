@@ -1,6 +1,6 @@
-from typing import Optional, cast
+from typing import Optional
 
-from tile_sets import Tile, Connector, sequential_dominoes
+from tile_sets import Tile, sequential_dominoes
 import wave_functions
 import grids
 import cli
@@ -61,14 +61,18 @@ if __name__ == '__main__':
     
     # Execution
     grid = grids.Grid1D(GRID_SIZE, GRID_CYCLIC)
-    tile_set = sequential_dominoes(NUM_CONN, cyclic = GRID_CYCLIC)
+    connectors, tile_set = sequential_dominoes(NUM_CONN, cyclic = GRID_CYCLIC)
     wave_function = wave_functions.WaveFunction(grid, tile_set)
     
     if not GRID_CYCLIC:
-        c1 = cast(Connector, 1)
-        cn = cast(Connector, NUM_CONN)
-        wave_function.apply_boundary_constraint(grids.Direction.RIGHT, {c1})  # Left boundary
-        wave_function.apply_boundary_constraint(grids.Direction.LEFT, {cn})  # Right boundary
+        wave_function.apply_boundary_constraint(
+            grids.Direction.RIGHT,  # Left boundary acts rightwards
+            {connectors[0]},
+        )
+        wave_function.apply_boundary_constraint(
+            grids.Direction.LEFT,  # Right boundary acts leftwards
+            {connectors[-1]},
+        )
     
     CliRunner1D(wave_function).run()
 

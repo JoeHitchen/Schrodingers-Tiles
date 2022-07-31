@@ -34,12 +34,13 @@ def _generate_tiles_from_spec(
     return tiles
 
 
-def create() -> List[Tile]:
+def create() -> Tuple[List[Connector], List[Tile]]:
     
     # Define connectors
     c0 = cast(Connector, 0)
     c1 = cast(Connector, 1)
     c2 = cast(Connector, 2)
+    connectors = [c0, c1, c2]
     
     # Define tile specs
     tile_specs: List[Tuple[ConnectorsSpec, List[int], str]] = [
@@ -64,5 +65,5 @@ def create() -> List[Tile]:
     tiles: List[Tile] = []
     for tile_spec in tile_specs:
         tiles.extend(_generate_tiles_from_spec(*tile_spec))
-    return tiles
+    return connectors, tiles
 

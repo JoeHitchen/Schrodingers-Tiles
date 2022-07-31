@@ -1,6 +1,6 @@
-from typing import Tuple, Optional, cast
+from typing import Tuple, Optional
 
-from tile_sets import Tile, Connector, ascii_box_tiles
+from tile_sets import Tile, ascii_box_tiles
 import wave_functions
 import grids
 import cli
@@ -45,17 +45,28 @@ if __name__ == '__main__':
     
     # Execution
     grid = grids.Grid2D(*GRID_SIZE, *GRID_CYCLIC)
-    tile_set = ascii_box_tiles()
+    connectors, tile_set = ascii_box_tiles()
     wave_function = wave_functions.WaveFunction(grid, tile_set)
     
-    c0 = cast(Connector, 0)
     if not GRID_CYCLIC[1]:
-        wave_function.apply_boundary_constraint(grids.Direction.DOWN, {c0})  # Upper boundary
-        wave_function.apply_boundary_constraint(grids.Direction.UP, {c0})  # Lower boundary
+        wave_function.apply_boundary_constraint(
+            grids.Direction.DOWN,  # Upper boundary acts downwards
+            {connectors[0]},
+        )
+        wave_function.apply_boundary_constraint(
+            grids.Direction.UP,  # Lower boundary acts upwards
+            {connectors[0]},
+        )
     
     if not GRID_CYCLIC[0]:
-        wave_function.apply_boundary_constraint(grids.Direction.RIGHT, {c0})  # Left boundary
-        wave_function.apply_boundary_constraint(grids.Direction.LEFT, {c0})  # Right boundary
+        wave_function.apply_boundary_constraint(
+            grids.Direction.RIGHT,  # Left boundary acts rightwards
+            {connectors[0]},
+        )
+        wave_function.apply_boundary_constraint(
+            grids.Direction.LEFT,  # Right boundary acts leftwards
+            {connectors[0]},
+        )
     
     CliRunner2D(wave_function).run()
 
