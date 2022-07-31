@@ -9,5 +9,6 @@ Connector = NewType('Connector', int)
 
 @dataclass
 class Tile:
+    id: str
     connectors: Dict[grids.Direction, Connector]
 

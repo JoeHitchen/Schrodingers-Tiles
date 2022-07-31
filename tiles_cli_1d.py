@@ -16,22 +16,29 @@ def create_1d_incrementing_tiles(num_conn: int, cyclic: bool = False) -> List[Ti
         ci = cast(Connector, i)
         cn = cast(Connector, i + 1)
         
-        tile_set.append(Tile({grids.Direction.LEFT: ci, grids.Direction.RIGHT: ci}))
+        tile_set.append(Tile(
+            f'{ci}{ci}',
+            {grids.Direction.LEFT: ci, grids.Direction.RIGHT: ci}),
+        )
         if i < num_conn:
-            tile_set.append(Tile({grids.Direction.LEFT: ci, grids.Direction.RIGHT: cn}))
+            tile_set.append(Tile(
+                f'{ci}{cn}',
+                {grids.Direction.LEFT: ci, grids.Direction.RIGHT: cn},
+            ))
         elif cyclic and i > 1:
-            tile_set.append(Tile({grids.Direction.LEFT: ci, grids.Direction.RIGHT: c1}))
+            tile_set.append(Tile(
+                f'{ci}{c1}',
+                {grids.Direction.LEFT: ci, grids.Direction.RIGHT: c1},
+            ))
     
     return tile_set
 
 
 class CliRunner1D(cli.CliRunner):
     
-    def inline_tile_string(self, tile: Tile) -> str:
-        return '[{}-{}]'.format(
-            tile.connectors[grids.Direction.LEFT],
-            tile.connectors[grids.Direction.RIGHT],
-        )
+    @staticmethod
+    def inline_tile_string(tile: Optional[Tile]) -> str:
+        return tile.id if tile else '??'
     
     def render_state(self) -> None:
         
@@ -64,13 +71,11 @@ class CliRunner1D(cli.CliRunner):
                 print(padding + ' '.join(tile_strings) + padding)
     
     
-    @staticmethod
-    def _render_tile(tile: Optional[Tile], line: int) -> str:
-        left = tile.connectors[grids.Direction.LEFT] if tile else '?'
-        right = tile.connectors[grids.Direction.RIGHT] if tile else '?'
+    @classmethod
+    def _render_tile(cls, tile: Optional[Tile], line: int) -> str:
         return {
             0: '╔══╗',
-            1: '║{}{}║'.format(left, right),
+            1: '║{}║'.format(cls.inline_tile_string(tile)),
             2: '╚══╝',
         }[line]
 

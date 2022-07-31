@@ -8,17 +8,9 @@ import cli
 
 class CliRunner2D(cli.CliRunner):
     
-    def __init__(self, wave_function: wave_functions.WaveFunction) -> None:
-        super().__init__(wave_function)
-        
-        self.tile_symbol_map = {
-            self._tile_spec(tile): symbol
-            for tile, symbol in ascii_box_tiles()
-        }
-    
-    
-    def inline_tile_string(self, tile: Optional[Tile]) -> str:
-        return self.tile_symbol_map.get(self._tile_spec(tile), '?')
+    @staticmethod
+    def inline_tile_string(tile: Optional[Tile]) -> str:
+        return tile.id if tile else '?'
     
     
     def render_state(self) -> None:
@@ -53,7 +45,7 @@ if __name__ == '__main__':
     
     # Execution
     grid = grids.Grid2D(*GRID_SIZE, *GRID_CYCLIC)
-    tile_set = [tile for tile, symbol in ascii_box_tiles()]
+    tile_set = ascii_box_tiles()
     wave_function = wave_functions.WaveFunction(grid, tile_set)
     
     c0 = cast(Connector, 0)

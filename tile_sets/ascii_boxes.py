@@ -12,28 +12,29 @@ def _generate_tiles_from_spec(
     connectors: ConnectorsSpec,
     rotations: List[int],
     symbols: str,
-) -> List[Tuple[Tile, str]]:
+) -> List[Tile]:
     
     def _rotate_connectors(connectors: ConnectorsSpec, num_places: int) -> ConnectorsSpec:
         return connectors[-num_places:] + connectors[:-num_places]
     
-    tiles_and_symbols = []
+    tiles = []
     for rotation in rotations:
         rotated_connectors = _rotate_connectors(connectors, rotation)
-        tiles_and_symbols.append((
-            Tile({
+        
+        tiles.append(Tile(
+            symbols[rotation],
+            {
                 grids.Direction.LEFT: rotated_connectors[0],
                 grids.Direction.UP: rotated_connectors[1],
                 grids.Direction.RIGHT: rotated_connectors[2],
                 grids.Direction.DOWN: rotated_connectors[3],
-            }),
-            symbols[rotation],
+            },
         ))
     
-    return tiles_and_symbols
+    return tiles
 
 
-def create() -> List[Tuple[Tile, str]]:
+def create() -> List[Tile]:
     
     # Define connectors
     c0 = cast(Connector, 0)
@@ -60,7 +61,7 @@ def create() -> List[Tuple[Tile, str]]:
     ]
     
     # Generate tiles
-    tiles: List[Tuple[Tile, str]] = []
+    tiles: List[Tile] = []
     for tile_spec in tile_specs:
         tiles.extend(_generate_tiles_from_spec(*tile_spec))
     return tiles

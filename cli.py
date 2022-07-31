@@ -1,3 +1,4 @@
+from typing import Optional
 import random
 
 from tile_sets import Tile
@@ -12,7 +13,8 @@ class CliRunner():
     def render_state(self) -> None:
         pass
     
-    def inline_tile_string(self, tile: Tile) -> str:
+    @staticmethod
+    def inline_tile_string(tile: Optional[Tile]) -> str:
         pass
     
     def run(self) -> None:
@@ -23,7 +25,7 @@ class CliRunner():
         while not self.wave_function.collapsed:
             cell = self.wave_function.get_most_constrained_cell()
             tile = random.choice(cell.state)
-            print(f'Selected {self.inline_tile_string(tile)} in {cell}')
+            print(f'Selected [{self.inline_tile_string(tile)}] in {cell}')
             
             cell.tile = tile
             self.render_state()
