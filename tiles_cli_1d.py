@@ -1,28 +1,16 @@
-from typing import List, Optional
+from typing import Optional
 
+from tile_sets import Tile, sequential_dominoes
 import wave_functions
 import grids
 import cli
 
 
-def create_1d_incrementing_tiles(num_conn: int, cyclic: bool = False) -> List[wave_functions.Tile]:
-    """Creates a set of 1D tiles that increments through the connections and (optionally) loops."""
-    
-    tile_set = []
-    for i in range(1, num_conn + 1):
-        tile_set.append({grids.Direction.LEFT: i, grids.Direction.RIGHT: i})
-        if i < num_conn:
-            tile_set.append({grids.Direction.LEFT: i, grids.Direction.RIGHT: i + 1})
-        elif cyclic and i > 1:
-            tile_set.append({grids.Direction.LEFT: i, grids.Direction.RIGHT: 1})
-    
-    return tile_set
-
-
 class CliRunner1D(cli.CliRunner):
     
-    def inline_tile_string(self, tile: wave_functions.Tile) -> str:
-        return f'[{tile[grids.Direction.LEFT]}-{tile[grids.Direction.RIGHT]}]'
+    @staticmethod
+    def inline_tile_string(tile: Optional[Tile]) -> str:
+        return tile.id if tile else '??'
     
     def render_state(self) -> None:
         
@@ -55,13 +43,11 @@ class CliRunner1D(cli.CliRunner):
                 print(padding + ' '.join(tile_strings) + padding)
     
     
-    @staticmethod
-    def _render_tile(tile: Optional[wave_functions.Tile], line: int) -> str:
-        left = tile[grids.Direction.LEFT] if tile else '?'
-        right = tile[grids.Direction.RIGHT] if tile else '?'
+    @classmethod
+    def _render_tile(cls, tile: Optional[Tile], line: int) -> str:
         return {
             0: '╔══╗',
-            1: '║{}{}║'.format(left, right),
+            1: '║{}║'.format(cls.inline_tile_string(tile)),
             2: '╚══╝',
         }[line]
 
@@ -75,12 +61,18 @@ if __name__ == '__main__':
     
     # Execution
     grid = grids.Grid1D(GRID_SIZE, GRID_CYCLIC)
-    tile_set = create_1d_incrementing_tiles(NUM_CONN, cyclic = GRID_CYCLIC)
+    connectors, tile_set = sequential_dominoes(NUM_CONN, cyclic = GRID_CYCLIC)
     wave_function = wave_functions.WaveFunction(grid, tile_set)
     
     if not GRID_CYCLIC:
-        wave_function.apply_boundary_constraint(grids.Direction.RIGHT, {1})  # Left boundary
-        wave_function.apply_boundary_constraint(grids.Direction.LEFT, {NUM_CONN})  # Right boundary
+        wave_function.apply_boundary_constraint(
+            grids.Direction.RIGHT,  # Left boundary acts rightwards
+            {connectors[0]},
+        )
+        wave_function.apply_boundary_constraint(
+            grids.Direction.LEFT,  # Right boundary acts leftwards
+            {connectors[-1]},
+        )
     
     CliRunner1D(wave_function).run()
 
