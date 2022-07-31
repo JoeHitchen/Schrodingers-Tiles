@@ -1,58 +1,9 @@
-from typing import List, Tuple, Optional, cast
+from typing import Tuple, Optional, cast
 
-from tile_sets import Tile, Connector
+from tile_sets import Tile, Connector, ascii_box_tiles
 import wave_functions
 import grids
 import cli
-
-
-def create_2d_ascii_box_tiles_and_symbols() -> List[Tuple[Tile, str]]:
-    """Creates a set of ASCII box-art tiles that can be single or double ruled."""
-    
-    def _generate_tiles_and_symbols(
-        spec: Tuple[Connector, Connector, Connector, Connector],
-        symbols: List[str],
-    ) -> List[Tuple[Tile, str]]:
-        """Creates a set of tiles based on a set of symbols and a connection template."""
-        
-        tiles_and_symbols = [(Tile({
-            grids.Direction.LEFT: spec[0],
-            grids.Direction.UP: spec[1],
-            grids.Direction.RIGHT: spec[2],
-            grids.Direction.DOWN: spec[3],
-        }), symbols[0])]
-        
-        for symbol in symbols[1:]:
-            tiles_and_symbols.append((Tile({
-                grids.Direction.LEFT: tiles_and_symbols[-1][0].connectors[grids.Direction.DOWN],
-                grids.Direction.UP: tiles_and_symbols[-1][0].connectors[grids.Direction.LEFT],
-                grids.Direction.RIGHT: tiles_and_symbols[-1][0].connectors[grids.Direction.UP],
-                grids.Direction.DOWN: tiles_and_symbols[-1][0].connectors[grids.Direction.RIGHT],
-            }), symbol))
-        
-        return tiles_and_symbols
-    
-    c0 = cast(Connector, 0)
-    c1 = cast(Connector, 1)
-    c2 = cast(Connector, 2)
-    
-    return [
-        *_generate_tiles_and_symbols((c0, c0, c0, c0), [' ']),
-        *_generate_tiles_and_symbols((c1, c1, c0, c0), ['┘', '└', '┌', '┐']),
-        *_generate_tiles_and_symbols((c1, c1, c1, c0), ['┴', '├', '┬', '┤']),
-        *_generate_tiles_and_symbols((c1, c0, c1, c0), ['─', '│']),
-        *_generate_tiles_and_symbols((c1, c1, c1, c1), ['┼']),
-        *_generate_tiles_and_symbols((c2, c2, c0, c0), ['╝', '╚', '╔', '╗']),
-        *_generate_tiles_and_symbols((c2, c2, c2, c0), ['╩', '╠', '╦', '╣']),
-        *_generate_tiles_and_symbols((c2, c0, c2, c0), ['═', '║']),
-        *_generate_tiles_and_symbols((c2, c2, c2, c2), ['╬']),
-        *_generate_tiles_and_symbols((c1, c2, c0, c0), ['╜', '╘', '╓', '╕']),
-        *_generate_tiles_and_symbols((c1, c2, c1, c0), ['╨', '╞', '╥', '╡']),
-        *_generate_tiles_and_symbols((c1, c2, c1, c2), ['╫']),
-        *_generate_tiles_and_symbols((c2, c1, c0, c0), ['╛', '╙', '╒', '╖']),
-        *_generate_tiles_and_symbols((c2, c1, c2, c0), ['╧', '╟', '╤', '╢']),
-        *_generate_tiles_and_symbols((c2, c1, c2, c1), ['╪']),
-    ]
 
 
 class CliRunner2D(cli.CliRunner):
@@ -62,7 +13,7 @@ class CliRunner2D(cli.CliRunner):
         
         self.tile_symbol_map = {
             self._tile_spec(tile): symbol
-            for tile, symbol in create_2d_ascii_box_tiles_and_symbols()
+            for tile, symbol in ascii_box_tiles()
         }
     
     
@@ -102,7 +53,7 @@ if __name__ == '__main__':
     
     # Execution
     grid = grids.Grid2D(*GRID_SIZE, *GRID_CYCLIC)
-    tile_set = [tile for tile, symbol in create_2d_ascii_box_tiles_and_symbols()]
+    tile_set = [tile for tile, symbol in ascii_box_tiles()]
     wave_function = wave_functions.WaveFunction(grid, tile_set)
     
     c0 = cast(Connector, 0)
