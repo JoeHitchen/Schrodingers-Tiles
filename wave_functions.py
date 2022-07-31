@@ -73,7 +73,7 @@ class Cell:
         original_connectors = self.connectors
         self.state = [
             tile for tile in self.state
-            if tile.connectors[grids.flip_direction(direction)] in constraint
+            if tile.connectors[grids.flip_direction(direction)].connects_to in constraint
         ]
         if not self.state:
             raise self.ConstraintError(f'{self} has no remaining state options')

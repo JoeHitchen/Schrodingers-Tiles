@@ -1,9 +1,12 @@
-"""Describes a set of ASCII box-art tiles that can be single or double ruled."""
+"""Describes a set of ASCII block tiles that can exhibit asymmetry.
+
+N.B. These tiles may not render correctly on Windows.
+"""
 from typing import List, Tuple
 
 import grids
 
-from . import Tile, Connector
+from . import Tile, Connector, create_paired_connectors
 
 ConnectorsSpec = List[Connector]
 
@@ -39,26 +42,17 @@ def create() -> Tuple[List[Connector], List[Tile]]:
     # Define connectors
     c0 = Connector('0')
     c1 = Connector('1')
-    c2 = Connector('2')
-    connectors = [c0, c1, c2]
+    c2p, c2n = create_paired_connectors('2')
+    connectors = [c1, c0, c2p, c2n]  # c1 first gives a solid boundary
     
     # Define tile specs
     tile_specs: List[Tuple[ConnectorsSpec, List[int], str]] = [
         ([c0, c0, c0, c0], [0], ' '),
-        ([c1, c1, c0, c0], [0, 1, 2, 3], '┘└┌┐'),
-        ([c1, c1, c1, c0], [0, 1, 2, 3], '┴├┬┤'),
-        ([c1, c0, c1, c0], [0, 1], '─│'),
-        ([c1, c1, c1, c1], [0], '┼'),
-        ([c2, c2, c0, c0], [0, 1, 2, 3], '╝╚╔╗'),
-        ([c2, c2, c2, c0], [0, 1, 2, 3], '╩╠╦╣'),
-        ([c2, c0, c2, c0], [0, 1], '═║'),
-        ([c2, c2, c2, c2], [0], '╬'),
-        ([c1, c2, c0, c0], [0, 1, 2, 3], '╜╘╓╕'),
-        ([c1, c2, c1, c0], [0, 1, 2, 3], '╨╞╥╡'),
-        ([c1, c2, c1, c2], [0], '╫'),
-        ([c2, c1, c0, c0], [0, 1, 2, 3], '╛╙╒╖'),
-        ([c2, c1, c2, c0], [0, 1, 2, 3], '╧╟╤╢'),
-        ([c2, c1, c2, c1], [0], '╪'),
+        ([c1, c1, c1, c1], [0], '█'),
+        ([c1, c2p, c0, c2n], [0, 1, 2, 3], '▌▀▐▄'),
+        ([c2n, c2p, c0, c0], [0, 1, 2, 3], '▘▝▗▖'),
+        ([c2p, c2n, c1, c1], [0, 1, 2, 3], '▟▙▛▜'),
+        ([c2n, c2p, c2n, c2p], [0, 1], '▚▞'),
     ]
     
     # Generate tiles

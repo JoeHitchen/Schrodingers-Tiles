@@ -8,9 +8,14 @@ import cli
 
 class CliRunner1D(cli.CliRunner):
     
+    def __init__(self, wave_function: wave_functions.WaveFunction, polarised: bool):
+        super().__init__(wave_function)
+        self.polarised = polarised
+    
+    
     @staticmethod
     def inline_tile_string(tile: Optional[Tile]) -> str:
-        return tile.id if tile else '??'
+        return tile.id if tile else '?/?'
     
     def render_state(self) -> None:
         
@@ -26,9 +31,9 @@ class CliRunner1D(cli.CliRunner):
                     *tile_strings,
                     tile_strings[0][:2] + '···',
                 ]
-            print('  ' + ' '.join(tile_strings) + '  ')
+            print('  ' + '  '.join(tile_strings) + '  ')
         
-        print((5 * len(self.wave_function.cells) + (15 if cyclic else 3)) * '=')
+        print((8 * len(self.wave_function.cells) + (15 if cyclic else 3)) * '=')
         
         # Cell options
         for i in range(max(len(cell.state) for cell in self.wave_function.cells)):
@@ -37,18 +42,32 @@ class CliRunner1D(cli.CliRunner):
                 for cell in self.wave_function.cells:
                     tile_strings.append((
                         self._render_tile(cell.state[i], line)
-                        if i < len(cell.state) else '    '
+                        if i < len(cell.state) else '     '
                     ))
-                padding = (8 if cyclic else 2) * ' '
-                print(padding + ' '.join(tile_strings) + padding)
+                padding = (9 if cyclic else 2) * ' '
+                print(padding + '  '.join(tile_strings) + padding)
     
     
-    @classmethod
-    def _render_tile(cls, tile: Optional[Tile], line: int) -> str:
+    def _render_tile(self, tile: Optional[Tile], line: int) -> str:
+        
+        if not self.polarised:
+            return {
+                0: '╔═══╗',
+                1: '║{}║'.format(self.inline_tile_string(tile)),
+                2: '╚═══╝',
+            }[line]
+        
+        if tile:
+            left = tile.connectors[grids.Direction.LEFT]
+            right = tile.connectors[grids.Direction.RIGHT]
+            mid_string = f'{left.style[:-1]}{right.style[:-1]}'
+        else:
+            mid_string = '??'
+        
         return {
-            0: '╔══╗',
-            1: '║{}║'.format(cls.inline_tile_string(tile)),
-            2: '╚══╝',
+            0: '-════+',
+            1: '- {} +'.format(mid_string),
+            2: '-════+',
         }[line]
 
 
@@ -56,12 +75,13 @@ if __name__ == '__main__':
     
     # Options
     NUM_CONN = 6
-    GRID_SIZE = 10
-    GRID_CYCLIC = False
+    GRID_SIZE = 8
+    GRID_CYCLIC = True
+    POLARISED = False
     
     # Execution
     grid = grids.Grid1D(GRID_SIZE, GRID_CYCLIC)
-    connectors, tile_set = sequential_dominoes(NUM_CONN, cyclic = GRID_CYCLIC)
+    connectors, tile_set = sequential_dominoes(NUM_CONN, GRID_CYCLIC, POLARISED)
     wave_function = wave_functions.WaveFunction(grid, tile_set)
     
     if not GRID_CYCLIC:
@@ -74,5 +94,5 @@ if __name__ == '__main__':
             {connectors[-1]},
         )
     
-    CliRunner1D(wave_function).run()
+    CliRunner1D(wave_function, POLARISED).run()
 
