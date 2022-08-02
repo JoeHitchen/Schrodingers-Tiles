@@ -7,6 +7,9 @@ class Direction(enum.Enum):
     RIGHT = 'R'
     UP = 'U'
     DOWN = 'D'
+    
+    def __repr__(self) -> str:
+        return self.value
 
 
 def flip_direction(direction: Direction) -> Direction:

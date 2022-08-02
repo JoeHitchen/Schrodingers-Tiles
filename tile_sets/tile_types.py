@@ -12,6 +12,9 @@ class Connector():
     
     def __str__(self) -> str:
         return self.style
+    
+    def __repr__(self) -> str:
+        return self.style
 
 
 def create_paired_connectors(style: str) -> Tuple[Connector, Connector]:
