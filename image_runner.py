@@ -7,6 +7,8 @@ def main(tile_prototypes: TilePrototypeMap) -> None:
     tiles = create_tiles_from_prototypes(tile_prototypes)
     for tile in tiles:
         print(tile)
+        print(tile.image)
+        tile.image.show()
 
 
 if __name__ == '__main__':
