@@ -8,6 +8,7 @@ images_size = (10, 10)
 
 conn_none = Connector('None')
 conn_pipe = Connector('Pipe')
+boundary_connector = conn_none
 
 
 class TileTypes(enum.Enum):

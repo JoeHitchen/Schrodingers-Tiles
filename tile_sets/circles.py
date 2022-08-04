@@ -8,6 +8,7 @@ images_size = (32, 32)
 
 conn_black = Connector('B')
 conn_white = Connector('W')
+boundary_connector = conn_black
 
 
 class TileTypes(enum.Enum):
