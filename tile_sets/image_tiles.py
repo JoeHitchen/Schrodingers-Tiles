@@ -57,7 +57,7 @@ def create_tiles_from_prototypes(prototypes: TilePrototypeMap) -> List[ImageTile
     for tile_type, tile_prototype in prototypes.items():
         for rotation in range(tile_prototype['rotations']):
             tiles.append(ImageTile(
-                tile_type.value,
+                f'{tile_type.value}{rotation + 1}',
                 _connectors_from_spec(tile_prototype['connectors'], rotation),
                 {'path': tile_prototype['image_path'], 'rotation': rotation},
             ))
