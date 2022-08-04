@@ -4,6 +4,8 @@ from .tile_types import Connector
 from .image_tiles import TilePrototypeMap
 
 
+images_size = (32, 32)
+
 conn_black = Connector('B')
 conn_white = Connector('W')
 

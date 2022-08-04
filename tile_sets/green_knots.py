@@ -4,6 +4,8 @@ from .tile_types import Connector
 from .image_tiles import TilePrototypeMap
 
 
+images_size = (10, 10)
+
 conn_none = Connector('None')
 conn_pipe = Connector('Pipe')
 
