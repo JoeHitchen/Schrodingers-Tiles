@@ -2,8 +2,7 @@ from typing import Tuple
 import random
 
 from PIL import Image as pillow
-from tile_sets.image_tiles import TilePrototypeMap, create_tiles_from_prototypes
-from tile_sets import Connector, green_knots, circles
+from tile_sets import ImageTileSet, GreenKnots, Circles
 import wave_functions
 import grids
 
@@ -32,20 +31,14 @@ def generate_wave_function_image(
     output_image.show()
 
 
-def main(
-    images_size: Tuple[int, int],
-    tile_prototypes: TilePrototypeMap,
-    boundary_connector: Connector,
-    cyclic: bool = False,
-) -> None:
+def main(tile_set: ImageTileSet, cyclic: bool = False) -> None:
     
     grid = grids.Grid2D(*(16, 9), *(cyclic, cyclic))
-    tiles = create_tiles_from_prototypes(tile_prototypes)
     
-    wave_function = wave_functions.WaveFunction(grid, tiles)
+    wave_function = wave_functions.WaveFunction(grid, tile_set.tiles)
     if not cyclic:
         for direction in grids.Direction:
-            wave_function.apply_boundary_constraint(direction, {boundary_connector})
+            wave_function.apply_boundary_constraint(direction, {tile_set.boundary_connector})
     
     while not wave_function.collapsed:
         cell = wave_function.get_most_constrained_cell()
@@ -53,21 +46,11 @@ def main(
         print(f'Selected [{tile.id}] in {cell}')
         cell.tile = tile
     
-    generate_wave_function_image(wave_function, images_size)
+    generate_wave_function_image(wave_function, tile_set.images_size)
 
 
 if __name__ == '__main__':
     
-    main(
-        green_knots.images_size,
-        green_knots.tile_prototypes,
-        green_knots.boundary_connector,
-        cyclic = False,
-    )
-    main(
-        circles.images_size,
-        circles.tile_prototypes,
-        circles.boundary_connector,
-        cyclic = True,
-    )
+    main(GreenKnots([GreenKnots.TileTypes.CORNER, GreenKnots.TileTypes.LINE]), cyclic = False)
+    main(Circles(), cyclic = True)
 
