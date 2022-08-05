@@ -29,6 +29,7 @@ class Grid(Protocol):
     size_y: int
     size_total: int
     cyclic_x: bool
+    cyclic_y: bool
     
     def make_cell_id(self, index: int) -> str:
         pass
@@ -47,6 +48,7 @@ class Grid1D():
         self.size_y = 1
         self.size_total = size_x
         self.cyclic_x = cyclic_x
+        self.cyclic_y = False
     
     
     def make_cell_id(self, index: int) -> str:
