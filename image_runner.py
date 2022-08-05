@@ -1,14 +1,10 @@
-from typing import Tuple
+from typing import Tuple, cast
 import random
 
 from PIL import Image as pillow
-from tile_sets import ImageTileSet, GreenKnots, Circles
+from tile_sets import ImageTile, ImageTileSet, GreenKnots, Circles
 import wave_functions
 import grids
-
-
-def convert_index_1d_to_2d(grid: grids.Grid2D, index: int) -> Tuple[int, int]:
-    return (index % grid.size_x, index // grid.size_x)
 
 
 def generate_wave_function_image(
@@ -22,12 +18,16 @@ def generate_wave_function_image(
     )
     output_image = pillow.new('RGB', output_size)
     
-    for index, cell in enumerate(wave_function.cells):
-        i, j = convert_index_1d_to_2d(wave_function.grid, index)
-        output_image.paste(
-            cell.tile.image,
-            (i * images_size[0], j * images_size[1]),
-        )
+    for i in range(0, wave_function.grid.size_x):
+        for j in range(0, wave_function.grid.size_y):
+            cell = wave_function.cells[i + j * wave_function.grid.size_x]
+            if not cell.tile:
+                continue
+            output_image.paste(
+                cast(ImageTile, cell.tile).image,
+                (i * images_size[0], j * images_size[1]),
+            )
+    
     output_image.show()
 
 
