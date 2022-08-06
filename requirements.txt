@@ -1,4 +1,7 @@
 
+# Main
+pillow
+
 # Linting
 flake8
 flake8-pyi
@@ -10,3 +13,4 @@ flake8-comprehensions
 
 # Typing
 mypy
+types-Pillow

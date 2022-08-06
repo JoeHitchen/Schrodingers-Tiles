@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Dict, TypedDict, Set, Optional
+from typing import List, Sequence, Dict, TypedDict, Set, Optional
 import random
 
 import grids
@@ -15,7 +15,7 @@ class Propagation(TypedDict):
 @dataclass
 class Cell:
     id: str
-    state: List[Tile]
+    state: Sequence[Tile]
     neighbours: Dict[grids.Direction, 'Cell'] = field(default_factory = dict)
     
     def __str__(self) -> str:
@@ -98,7 +98,7 @@ class Cell:
 
 class WaveFunction:
     
-    def __init__(self, grid: grids.Grid, tile_set: List[Tile]):
+    def __init__(self, grid: grids.Grid, tile_set: Sequence[Tile]):
         self.grid = grid
         self.cells = [Cell(
             id = grid.make_cell_id(index),
