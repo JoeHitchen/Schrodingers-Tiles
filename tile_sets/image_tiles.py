@@ -28,6 +28,9 @@ class ImageSpec(TypedDict):
 class ImageTile(Tile):
     image_spec: ImageSpec
     
+    def __hash__(self) -> int:
+        return hash(self.id)
+    
     @cached_property
     def image(self) -> pillow.Image:
         img = pillow.open(self.image_spec['path'])
