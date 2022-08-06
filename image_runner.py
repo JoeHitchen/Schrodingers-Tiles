@@ -3,7 +3,7 @@ from functools import lru_cache
 import random
 
 from PIL import Image as pillow
-from tile_sets import ImageTile, ImageTileSet, GreenKnots, Circles
+from tile_sets import ImageTile, ImageTileSet, Circuits
 import wave_functions
 import grids
 
@@ -79,10 +79,5 @@ def main(
 
 if __name__ == '__main__':
     
-    main(
-        GreenKnots([GreenKnots.TileTypes.CORNER, GreenKnots.TileTypes.LINE]),
-        (32, 25),
-        cyclic = False,
-    )
-    main(Circles(), (15, 15), cyclic = True, display_every = 7)
+    main(Circuits(), (64, 64), cyclic = False, display_every = 512)
 
