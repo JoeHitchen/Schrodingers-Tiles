@@ -50,11 +50,12 @@ def generate_wave_function_image(
 
 def main(
     tile_set: ImageTileSet,
+    grid_size: Tuple[int, int],
     cyclic: bool = False,
     display_every: Optional[int] = None,
 ) -> None:
     
-    grid = grids.Grid2D(*(16, 9), *(cyclic, cyclic))
+    grid = grids.Grid2D(*grid_size, *(cyclic, cyclic))
     
     wave_function = wave_functions.WaveFunction(grid, tile_set.tiles)
     if not cyclic:
@@ -78,6 +79,10 @@ def main(
 
 if __name__ == '__main__':
     
-    main(GreenKnots([GreenKnots.TileTypes.CORNER, GreenKnots.TileTypes.LINE]), cyclic = False)
-    main(Circles(), cyclic = True, display_every = 4)
+    main(
+        GreenKnots([GreenKnots.TileTypes.CORNER, GreenKnots.TileTypes.LINE]),
+        (32, 25),
+        cyclic = False,
+    )
+    main(Circles(), (15, 15), cyclic = True, display_every = 7)
 
