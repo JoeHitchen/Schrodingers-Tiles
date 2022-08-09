@@ -71,9 +71,10 @@ class Cell:
         
         # Apply new constraint
         original_connectors = self.connectors
+        flipped_direction = grids.flip_direction(direction)
         self.state = [
             tile for tile in self.state
-            if tile.connectors[grids.flip_direction(direction)].connects_to in constraint
+            if tile.connectors[flipped_direction].connects_to.intersection(constraint)
         ]
         if not self.state:
             raise self.ConstraintError(f'{self} has no remaining state options')

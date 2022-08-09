@@ -5,10 +5,12 @@ import grids
 
 
 class Connector():
+    """Describes the interface a tile presents to connect with adjacent tiles."""
     
     def __init__(self, style: str):
+        """Creates a simple connector that connects to itself."""
         self.style = style
-        self.connects_to = self
+        self.connects_to = {self}
     
     def __str__(self) -> str:
         return self.style
@@ -18,9 +20,11 @@ class Connector():
 
 
 def create_paired_connectors(style: str) -> Tuple[Connector, Connector]:
-    positive, negative = Connector(f'{style}+'), Connector(f'{style}-')
-    positive.connects_to = negative
-    negative.connects_to = positive
+    """Creates a pair of connectors which will only connect to each other (not themselves)."""
+    
+    positive, negative = Connector(f'{style} (+)'), Connector(f'{style} (-)')
+    positive.connects_to = {negative}
+    negative.connects_to = {positive}
     return positive, negative
 
 
