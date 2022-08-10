@@ -3,8 +3,10 @@ from .image_tiles import ImageTileSet
 
 
 conn_board = Connector('None')
-conn_track = Connector('Pipe')
+conn_track = Connector('Track')
 conn_cable = Connector('Cable')
+conn_track_stub = create_stub_connector(conn_track)
+conn_cable_stub = create_stub_connector(conn_cable)
 
 conn_chip_body = Connector('Chip-Body')
 conn_chip_body_stub = create_stub_connector(conn_chip_body)
@@ -23,8 +25,8 @@ class Circuits(ImageTileSet):
         TRACK_CORNER = 'TC'
         TRACK_STRAIGHT = 'TS'
         TRACK_JUNCTION = 'TJ'
-        TRACK_START = 'TS'
-        TRACK_CONNECT = 'TC'
+        TRACK_START = 'BS'
+        TRACK_CONNECT = 'BC'
         SINGLE_DIAG = 'SD'
         DOUBLE_DIAG = 'DD'
         CABLE_START = 'AS'
@@ -57,12 +59,12 @@ class Circuits(ImageTileSet):
             'image_path': 'tile_sets/images/circuits_track_junction.png',
         },
         TileTypes.TRACK_START: {
-            'connectors': (conn_board, conn_track, conn_board, conn_board),
+            'connectors': (conn_board, conn_track_stub, conn_board, conn_board),
             'rotations': 4,
             'image_path': 'tile_sets/images/circuits_track_start.png',
         },
         TileTypes.TRACK_CONNECT: {
-            'connectors': (conn_track, conn_board, conn_track, conn_board),
+            'connectors': (conn_track_stub, conn_board, conn_track_stub, conn_board),
             'rotations': 2,
             'image_path': 'tile_sets/images/circuits_track_connect.png',
         },
@@ -77,7 +79,7 @@ class Circuits(ImageTileSet):
             'image_path': 'tile_sets/images/circuits_double_diagonal.png',
         },
         TileTypes.CABLE_START: {
-            'connectors': (conn_board, conn_cable, conn_board, conn_track),
+            'connectors': (conn_board, conn_cable_stub, conn_board, conn_track_stub),
             'rotations': 4,
             'image_path': 'tile_sets/images/circuits_cable_start.png',
         },
@@ -87,7 +89,7 @@ class Circuits(ImageTileSet):
             'image_path': 'tile_sets/images/circuits_cable_middle.png',
         },
         TileTypes.CABLE_BRIDGE: {
-            'connectors': (conn_cable, conn_track, conn_cable, conn_track),
+            'connectors': (conn_cable, conn_track_stub, conn_cable, conn_track_stub),
             'rotations': 2,
             'image_path': 'tile_sets/images/circuits_cable_bridge.png',
         },
@@ -99,7 +101,7 @@ class Circuits(ImageTileSet):
         TileTypes.CHIP_EDGE: {
             'connectors': (
                 conn_chip_edge_left,
-                conn_track,
+                conn_track_stub,
                 conn_chip_edge_right,
                 conn_chip_body_stub,
             ),
