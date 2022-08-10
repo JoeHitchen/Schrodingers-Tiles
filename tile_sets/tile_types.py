@@ -28,6 +28,15 @@ def create_paired_connectors(style: str) -> Tuple[Connector, Connector]:
     return positive, negative
 
 
+def create_stub_connector(main_connector: Connector, style: str = '') -> Connector:
+    """Stub connectors connect to the main connector, but not to themselves."""
+    
+    stub_connector = Connector(style if style else f'{main_connector.style} (s)')
+    stub_connector.connects_to = {main_connector}
+    main_connector.connects_to.add(stub_connector)
+    return stub_connector
+
+
 @dataclass
 class Tile:
     id: str

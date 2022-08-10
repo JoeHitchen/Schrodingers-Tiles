@@ -1,12 +1,16 @@
-from .tile_types import Connector, create_paired_connectors
+from .tile_types import Connector, create_paired_connectors, create_stub_connector
 from .image_tiles import ImageTileSet
 
 
 conn_board = Connector('None')
 conn_track = Connector('Pipe')
 conn_cable = Connector('Cable')
+
 conn_chip_body = Connector('Chip-Body')
-conn_chip_left, conn_chip_right = create_paired_connectors('Chip-Edge')
+conn_chip_body_stub = create_stub_connector(conn_chip_body)
+conn_chip_edge_left, conn_chip_edge_right = create_paired_connectors('Chip-Edge')
+conn_chip_corner_left = create_stub_connector(conn_chip_edge_right, 'Chip-Corner (+)')
+conn_chip_corner_right = create_stub_connector(conn_chip_edge_left, 'Chip-Corner (-)')
 
 
 class Circuits(ImageTileSet):
@@ -93,12 +97,17 @@ class Circuits(ImageTileSet):
             'image_path': 'tile_sets/images/circuits_chip_body.png',
         },
         TileTypes.CHIP_EDGE: {
-            'connectors': (conn_chip_left, conn_track, conn_chip_right, conn_chip_body),
+            'connectors': (
+                conn_chip_edge_left,
+                conn_track,
+                conn_chip_edge_right,
+                conn_chip_body_stub,
+            ),
             'rotations': 4,
             'image_path': 'tile_sets/images/circuits_chip_edge.png',
         },
         TileTypes.CHIP_CORNER: {
-            'connectors': (conn_chip_left, conn_board, conn_board, conn_chip_right),
+            'connectors': (conn_chip_corner_left, conn_board, conn_board, conn_chip_corner_right),
             'rotations': 4,
             'image_path': 'tile_sets/images/circuits_chip_corner.png',
         },
