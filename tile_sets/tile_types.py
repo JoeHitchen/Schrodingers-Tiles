@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Tuple, Dict
+from typing import Tuple, Set, Dict
 
 import grids
 
@@ -7,10 +7,13 @@ import grids
 class Connector():
     """Describes the interface a tile presents to connect with adjacent tiles."""
     
-    def __init__(self, style: str):
-        """Creates a simple connector that connects to itself."""
+    def __init__(self, style: str, connects_to: Set['Connector'] = set()):
+        """Creates a simple connector that connects to itself and the other connectors provided."""
+        
         self.style = style
-        self.connects_to = {self}
+        self.connects_to = {self, *connects_to}
+        for connector in connects_to:
+            connector.connects_to.add(self)
     
     def __str__(self) -> str:
         return self.style

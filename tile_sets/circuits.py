@@ -8,6 +8,9 @@ conn_cable = Connector('Cable')
 conn_track_stub = create_stub_connector(conn_track)
 conn_cable_stub = create_stub_connector(conn_cable)
 
+conn_diag_a = Connector('Track-Diag-A', {conn_track, conn_track_stub})
+conn_diag_b = Connector('Track-Diag-B', {conn_track, conn_track_stub})
+
 conn_chip_body = Connector('Chip-Body')
 conn_chip_body_stub = create_stub_connector(conn_chip_body)
 conn_chip_edge_left, conn_chip_edge_right = create_paired_connectors('Chip-Edge')
@@ -69,12 +72,12 @@ class Circuits(ImageTileSet):
             'image_path': 'tile_sets/images/circuits_track_connect.png',
         },
         TileTypes.SINGLE_DIAG: {
-            'connectors': (conn_board, conn_track, conn_track, conn_board),
+            'connectors': (conn_board, conn_diag_a, conn_diag_b, conn_board),
             'rotations': 4,
             'image_path': 'tile_sets/images/circuits_single_diagonal.png',
         },
         TileTypes.DOUBLE_DIAG: {
-            'connectors': (conn_track, conn_track, conn_track, conn_track),
+            'connectors': (conn_diag_b, conn_diag_a, conn_diag_b, conn_diag_a),
             'rotations': 2,
             'image_path': 'tile_sets/images/circuits_double_diagonal.png',
         },
