@@ -1,3 +1,5 @@
+from typing import List
+
 from .tile_types import Connector, create_paired_connectors, create_stub_connector
 from .image_tiles import ImageTileSet
 
@@ -24,7 +26,7 @@ class Circuits(ImageTileSet):
     boundary_connector = conn_board
     
     class TileTypes(ImageTileSet.TileTypes):
-        BOARD = 'O'
+        BOARD = 'OO'
         TRACK_CORNER = 'TC'
         TRACK_STRAIGHT = 'TS'
         TRACK_JUNCTION = 'TJ'
@@ -38,6 +40,21 @@ class Circuits(ImageTileSet):
         CHIP_BODY = 'HB'
         CHIP_EDGE = 'HE'
         CHIP_CORNER = 'HC'
+    
+    best_tile_subset: List[ImageTileSet.TileTypes] = [  # Removes two tiles for better outputs
+        TileTypes.BOARD,
+        TileTypes.TRACK_STRAIGHT,
+        TileTypes.TRACK_START,
+        TileTypes.TRACK_CONNECT,
+        TileTypes.SINGLE_DIAG,
+        TileTypes.DOUBLE_DIAG,
+        TileTypes.CABLE_START,
+        TileTypes.CABLE_MIDDLE,
+        TileTypes.CABLE_BRIDGE,
+        TileTypes.CHIP_BODY,
+        TileTypes.CHIP_EDGE,
+        TileTypes.CHIP_CORNER,
+    ]
     
     
     tile_prototypes = {

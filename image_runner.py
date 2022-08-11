@@ -79,5 +79,5 @@ def main(
 
 if __name__ == '__main__':
     
-    main(Circuits(), (64, 64), cyclic = False, display_every = 512)
+    main(Circuits(Circuits.best_tile_subset), (64, 64), cyclic = False, display_every = 512)
 
