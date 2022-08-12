@@ -3,7 +3,7 @@ from functools import lru_cache
 import random
 
 from PIL import Image as pillow
-from tile_sets import ImageTile, ImageTileSet, GreenKnots, Circles
+from tile_sets import ImageTile, ImageTileSet, GreenKnots, Circles, Circuits
 import wave_functions
 import grids
 
@@ -85,4 +85,5 @@ if __name__ == '__main__':
         cyclic = False,
     )
     main(Circles(), (15, 15), cyclic = True, display_every = 7)
+    main(Circuits(Circuits.best_tile_subset), (64, 64), cyclic = False, display_every = 512)
 

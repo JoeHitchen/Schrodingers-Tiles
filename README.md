@@ -38,18 +38,13 @@ The `apply_boundary_constraint` wave function method allows the boundary to act 
 
 The whole process is currently triggered by scripts, with the script used depending on what tiles you wish to use.
 The options are:
-* `image_runner.py` generates images using both the Green Knots and Circles tile sets, with different configurations
+* `image_runner.py` generates images using the Green Knots, Circles, and Circuits tile sets, each with different configurations
 * `tiles_cli_2d.py` generates a terminal output based on the unicode box tiles
 * `tiles_cli_1d.py` generates a terminal output using a set of sequential dominoes
 
 
 ## Possible future directions
 There are various directions that this coding challenge could be extended in future. A non-exhaustive list of ideas includes:
-
-* Connector variants  
-  _Connectors can currently only come in a self-matching symmetrical form, or a paired-but-antisymmetric couple.
-  However, this is not sufficient for the adjacency rules of the [circuits tile set](https://github.com/mxgmn/WaveFunctionCollapse/tree/master/tilesets/Circuit) so a generalisation is required.
-  This has also been opened for tracking (see [#1](https://github.com/JoeHitchen/Schrodingers-Tiles/issues/1)) and an implementation is underway._
 
 * Weighted selection  
   _Currently each tile possibility is given an equal weighting, but this does not allow for deliberate biases towards certain types of tile to be introduced (except by stacking the deck with multiple copies).

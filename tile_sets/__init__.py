@@ -5,6 +5,7 @@ from .ascii_blocks import create as ascii_block_tiles
 from .image_tiles import ImageTile, ImageTileSet
 from .green_knots import GreenKnots
 from .circles import Circles
+from .circuits import Circuits
 
 __all__ = [
     'Tile',
@@ -17,4 +18,5 @@ __all__ = [
     'ImageTileSet',
     'GreenKnots',
     'Circles',
+    'Circuits',
 ]
