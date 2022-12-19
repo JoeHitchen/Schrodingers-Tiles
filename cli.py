@@ -15,7 +15,7 @@ class CliRunner():
     
     @staticmethod
     def inline_tile_string(tile: Optional[Tile]) -> str:
-        pass
+        return ''
     
     def run(self) -> None:
         
