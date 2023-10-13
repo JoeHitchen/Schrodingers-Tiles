@@ -1,5 +1,3 @@
-from typing import List, Tuple
-
 import grids
 
 from . import Tile, Connector, create_paired_connectors
@@ -9,10 +7,10 @@ def create(
     num_conn: int,
     cyclic: bool = False,
     polarised: bool = False,
-) -> Tuple[List[Connector], List[Tile]]:
+) -> tuple[list[Connector], list[Tile]]:
     """Creates a set of 1D tiles that increments through the connections and (optionally) loops."""
 
-    def create_unpolarised_connectors(style: str) -> Tuple[Connector, Connector]:
+    def create_unpolarised_connectors(style: str) -> tuple[Connector, Connector]:
         return 2 * (Connector(style),)
 
     connector_function = create_paired_connectors if polarised else create_unpolarised_connectors
@@ -48,7 +46,7 @@ def create(
                 },
             ))
 
-    all_connectors: List[Connector] = []
+    all_connectors: list[Connector] = []
     for connector_pair in connector_pairs:
         all_connectors.extend(connector_pair)
     return all_connectors, tile_set

@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import List, Tuple, Dict, TypedDict
+from typing import TypedDict
 from dataclasses import dataclass
 from functools import cached_property
 import enum
@@ -10,7 +10,7 @@ import grids
 from .tile_types import Tile, Connector
 
 
-ConnectorsSpec = Tuple[Connector, Connector, Connector, Connector]
+ConnectorsSpec = tuple[Connector, Connector, Connector, Connector]
 
 
 class TilePrototype(TypedDict):
@@ -40,7 +40,7 @@ class ImageTile(Tile):
 def _connectors_from_spec(
     connectors: ConnectorsSpec,
     rotation: int,
-) -> Dict[grids.Direction, Connector]:
+) -> dict[grids.Direction, Connector]:
 
     directions = [
         grids.Direction.LEFT, grids.Direction.UP,
@@ -53,15 +53,15 @@ def _connectors_from_spec(
 
 class ImageTileSet(ABC):
 
-    images_size: Tuple[int, int]
+    images_size: tuple[int, int]
     boundary_connector: Connector
-    tile_prototypes: Dict['TileTypes', 'TilePrototype']
+    tile_prototypes: dict['TileTypes', 'TilePrototype']
 
     class TileTypes(enum.Enum):
         pass
 
 
-    def __init__(self, tile_types: List[TileTypes] = []) -> None:
+    def __init__(self, tile_types: list[TileTypes] = []) -> None:
         """Generates the tiles for the tileset based on the subset provided."""
 
         filtered_tile_types = {

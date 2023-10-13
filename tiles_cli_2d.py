@@ -1,5 +1,3 @@
-from typing import Optional
-
 from tile_sets import Tile, ascii_box_tiles
 import wave_functions
 import grids
@@ -9,7 +7,7 @@ import cli
 class CliRunner2D(cli.CliRunner):
 
     @staticmethod
-    def inline_tile_string(tile: Optional[Tile]) -> str:
+    def inline_tile_string(tile: Tile | None) -> str:
         return tile.id if tile else '?'
 
 

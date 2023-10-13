@@ -1,5 +1,3 @@
-from typing import Optional
-
 from tile_sets import Tile, sequential_dominoes
 import wave_functions
 import grids
@@ -14,7 +12,7 @@ class CliRunner1D(cli.CliRunner):
 
 
     @staticmethod
-    def inline_tile_string(tile: Optional[Tile]) -> str:
+    def inline_tile_string(tile: Tile | None) -> str:
         return tile.id if tile else '?/?'
 
     def render_state(self) -> None:
@@ -48,7 +46,7 @@ class CliRunner1D(cli.CliRunner):
                 print(padding + '  '.join(tile_strings) + padding)
 
 
-    def _render_tile(self, tile: Optional[Tile], line: int) -> str:
+    def _render_tile(self, tile: Tile | None, line: int) -> str:
 
         if not self.polarised:
             return {

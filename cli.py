@@ -1,4 +1,3 @@
-from typing import Optional
 import random
 
 from tile_sets import Tile
@@ -14,7 +13,7 @@ class CliRunner():
         pass
 
     @staticmethod
-    def inline_tile_string(tile: Optional[Tile]) -> str:
+    def inline_tile_string(tile: Tile | None) -> str:
         return ''
 
     def run(self) -> None:
