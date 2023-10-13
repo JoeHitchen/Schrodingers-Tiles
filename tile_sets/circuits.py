@@ -21,10 +21,10 @@ conn_chip_corner_right = create_stub_connector(conn_chip_edge_left, 'Chip-Corner
 
 
 class Circuits(ImageTileSet):
-    
+
     images_size = (14, 14)
     boundary_connector = conn_board
-    
+
     class TileTypes(ImageTileSet.TileTypes):
         BOARD = 'OO'
         TRACK_CORNER = 'TC'
@@ -40,7 +40,7 @@ class Circuits(ImageTileSet):
         CHIP_BODY = 'HB'
         CHIP_EDGE = 'HE'
         CHIP_CORNER = 'HC'
-    
+
     best_tile_subset: List[ImageTileSet.TileTypes] = [  # Removes two tiles for better outputs
         TileTypes.BOARD,
         TileTypes.TRACK_STRAIGHT,
@@ -55,8 +55,8 @@ class Circuits(ImageTileSet):
         TileTypes.CHIP_EDGE,
         TileTypes.CHIP_CORNER,
     ]
-    
-    
+
+
     tile_prototypes = {
         TileTypes.BOARD: {
             'connectors': (conn_board, conn_board, conn_board, conn_board),

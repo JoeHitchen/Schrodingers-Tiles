@@ -7,18 +7,18 @@ conn_pipe = Connector('Pipe')
 
 
 class GreenKnots(ImageTileSet):
-    
+
     images_size = (10, 10)
     boundary_connector = conn_none
-    
+
     class TileTypes(ImageTileSet.TileTypes):
         EMPTY = 'O'
         CORNER = 'r'
         LINE = 'l'
         JUNCTION = 'T'
         CROSS = 'x'
-    
-    
+
+
     tile_prototypes = {
         TileTypes.EMPTY: {
             'connectors': (conn_none, conn_none, conn_none, conn_none),

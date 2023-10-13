@@ -7,10 +7,10 @@ conn_white = Connector('W')
 
 
 class Circles(ImageTileSet):
-    
+
     images_size = (32, 32)
     boundary_connector = conn_black
-    
+
     class TileTypes(ImageTileSet.TileTypes):
         BLACK_FULL = 'BF'
         BLACK_HALF = 'BH'
@@ -20,8 +20,8 @@ class Circles(ImageTileSet):
         WHITE_HALF = 'WH'
         WHITE_QUARTER = 'WQ'
         WHITE_TIMER = 'WT'
-    
-    
+
+
     tile_prototypes = {
         TileTypes.BLACK_FULL: {
             'connectors': (conn_black, conn_black, conn_black, conn_black),
