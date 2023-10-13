@@ -48,10 +48,7 @@ def _connectors_from_spec(
     ]
     cycled_connectors = connectors[-rotation:] + connectors[:-rotation]
 
-    return {
-        direction: connector
-        for direction, connector in zip(directions, cycled_connectors)
-    }
+    return dict(zip(directions, cycled_connectors))
 
 
 class ImageTileSet(ABC):
