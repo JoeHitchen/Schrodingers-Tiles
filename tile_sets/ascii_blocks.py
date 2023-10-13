@@ -2,20 +2,18 @@
 
 N.B. These tiles may not render correctly on Windows.
 """
-from typing import List, Tuple
-
 import grids
 
 from . import Tile, Connector, create_paired_connectors
 
-ConnectorsSpec = List[Connector]
+ConnectorsSpec = list[Connector]
 
 
 def _generate_tiles_from_spec(
     connectors: ConnectorsSpec,
-    rotations: List[int],
+    rotations: list[int],
     symbols: str,
-) -> List[Tile]:
+) -> list[Tile]:
 
     def _rotate_connectors(connectors: ConnectorsSpec, num_places: int) -> ConnectorsSpec:
         return connectors[-num_places:] + connectors[:-num_places]
@@ -37,7 +35,7 @@ def _generate_tiles_from_spec(
     return tiles
 
 
-def create() -> Tuple[List[Connector], List[Tile]]:
+def create() -> tuple[list[Connector], list[Tile]]:
 
     # Define connectors
     c0 = Connector('0')
@@ -46,7 +44,7 @@ def create() -> Tuple[List[Connector], List[Tile]]:
     connectors = [c1, c0, c2p, c2n]  # c1 first gives a solid boundary
 
     # Define tile specs
-    tile_specs: List[Tuple[ConnectorsSpec, List[int], str]] = [
+    tile_specs: list[tuple[ConnectorsSpec, list[int], str]] = [
         ([c0, c0, c0, c0], [0], ' '),
         ([c1, c1, c1, c1], [0], '█'),
         ([c1, c2p, c0, c2n], [0, 1, 2, 3], '▌▀▐▄'),
@@ -56,7 +54,7 @@ def create() -> Tuple[List[Connector], List[Tile]]:
     ]
 
     # Generate tiles
-    tiles: List[Tile] = []
+    tiles: list[Tile] = []
     for tile_spec in tile_specs:
         tiles.extend(_generate_tiles_from_spec(*tile_spec))
     return connectors, tiles

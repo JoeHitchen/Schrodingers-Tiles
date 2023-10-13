@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Sequence, Dict, TypedDict, Set, Optional
+from typing import Sequence, TypedDict
 import random
 
 import grids
@@ -9,14 +9,14 @@ from tile_sets import Tile, Connector
 class Propagation(TypedDict):
     cell: 'Cell'
     direction: grids.Direction
-    constraint: Set[Connector]
+    constraint: set[Connector]
 
 
 @dataclass
 class Cell:
     id: str
     state: Sequence[Tile]
-    neighbours: Dict[grids.Direction, 'Cell'] = field(default_factory = dict)
+    neighbours: dict[grids.Direction, 'Cell'] = field(default_factory = dict)
 
     def __str__(self) -> str:
         return f'Cell {self.id}'
@@ -35,7 +35,7 @@ class Cell:
         return len(self.state) == 1
 
     @property
-    def tile(self) -> Optional[Tile]:
+    def tile(self) -> Tile | None:
         return self.state[0] if self.collapsed else None
 
     @tile.setter
@@ -51,7 +51,7 @@ class Cell:
 
 
     @property
-    def connectors(self) -> Dict[grids.Direction, Set[Connector]]:
+    def connectors(self) -> dict[grids.Direction, set[Connector]]:
         return {
             direction: {
                 tile.connectors[direction]
@@ -65,8 +65,8 @@ class Cell:
     def constrain(
         self,
         direction: grids.Direction,
-        constraint: Set[Connector],
-    ) -> List[Propagation]:
+        constraint: set[Connector],
+    ) -> list[Propagation]:
         """Applies a constraint to the cell states and determines any onward propagations."""
 
         # Apply new constraint
@@ -139,7 +139,7 @@ class WaveFunction:
     def apply_boundary_constraint(
         self,
         direction: grids.Direction,
-        constraint: Set[Connector],
+        constraint: set[Connector],
     ) -> None:
         """Applies the constraint given in the specified direction and propagates it as needed.
 
@@ -155,7 +155,7 @@ class WaveFunction:
 
 
     @staticmethod
-    def propagate_constraints(propagations: List[Propagation]) -> None:
+    def propagate_constraints(propagations: list[Propagation]) -> None:
         """Iteratively applies constraints to cells until a consistent state is reached."""
 
         while propagations:

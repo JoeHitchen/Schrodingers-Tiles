@@ -1,4 +1,4 @@
-from typing import Tuple, Optional, cast
+from typing import cast
 from functools import lru_cache
 import random
 
@@ -8,11 +8,11 @@ import wave_functions
 import grids
 
 
-StateTuple = Tuple[ImageTile]
+StateTuple = tuple[ImageTile]
 
 
 @lru_cache
-def _render_state_vector(state: StateTuple, images_size: Tuple[int, int]) -> pillow.Image:
+def _render_state_vector(state: StateTuple, images_size: tuple[int, int]) -> pillow.Image:
     avg = pillow.new('RGB', images_size)
     for count, tile in enumerate(state):
         avg = pillow.blend(avg, tile.image, 1. / (1. + count))
@@ -21,7 +21,7 @@ def _render_state_vector(state: StateTuple, images_size: Tuple[int, int]) -> pil
 
 def generate_wave_function_image(
     wave_function: wave_functions.WaveFunction,
-    images_size: Tuple[int, int],
+    images_size: tuple[int, int],
 ) -> None:
 
     output_grid_size = (
@@ -50,9 +50,9 @@ def generate_wave_function_image(
 
 def main(
     tile_set: ImageTileSet,
-    grid_size: Tuple[int, int],
+    grid_size: tuple[int, int],
     cyclic: bool = False,
-    display_every: Optional[int] = None,
+    display_every: int | None = None,
 ) -> None:
 
     grid = grids.Grid2D(*grid_size, *(cyclic, cyclic))

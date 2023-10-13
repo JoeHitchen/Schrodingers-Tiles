@@ -1,5 +1,3 @@
-from typing import List
-
 from .tile_types import Connector, create_paired_connectors, create_stub_connector
 from .image_tiles import ImageTileSet
 
@@ -41,7 +39,7 @@ class Circuits(ImageTileSet):
         CHIP_EDGE = 'HE'
         CHIP_CORNER = 'HC'
 
-    best_tile_subset: List[ImageTileSet.TileTypes] = [  # Removes two tiles for better outputs
+    best_tile_subset: list[ImageTileSet.TileTypes] = [  # Removes two tiles for better outputs
         TileTypes.BOARD,
         TileTypes.TRACK_STRAIGHT,
         TileTypes.TRACK_START,

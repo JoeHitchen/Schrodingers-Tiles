@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Tuple, Set, Dict
 
 import grids
 
@@ -7,7 +6,7 @@ import grids
 class Connector():
     """Describes the interface a tile presents to connect with adjacent tiles."""
 
-    def __init__(self, style: str, connects_to: Set['Connector'] = set()):
+    def __init__(self, style: str, connects_to: set['Connector'] = set()):
         """Creates a simple connector that connects to itself and the other connectors provided."""
 
         self.style = style
@@ -22,7 +21,7 @@ class Connector():
         return self.style
 
 
-def create_paired_connectors(style: str) -> Tuple[Connector, Connector]:
+def create_paired_connectors(style: str) -> tuple[Connector, Connector]:
     """Creates a pair of connectors which will only connect to each other (not themselves)."""
 
     positive, negative = Connector(f'{style} (+)'), Connector(f'{style} (-)')
@@ -43,5 +42,5 @@ def create_stub_connector(main_connector: Connector, style: str = '') -> Connect
 @dataclass
 class Tile:
     id: str
-    connectors: Dict[grids.Direction, Connector]
+    connectors: dict[grids.Direction, Connector]
 

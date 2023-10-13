@@ -1,4 +1,4 @@
-from typing import List, Tuple, Protocol
+from typing import Protocol
 import enum
 
 
@@ -37,7 +37,7 @@ class Grid(Protocol):
     def get_boundary_slice(self, direction: Direction) -> slice:
         pass
 
-    def get_neighbour_slices(self) -> List[Tuple[slice, Direction, bool]]:
+    def get_neighbour_slices(self) -> list[tuple[slice, Direction, bool]]:
         pass
 
 
@@ -62,7 +62,7 @@ class Grid1D():
         }[direction]
 
 
-    def get_neighbour_slices(self) -> List[Tuple[slice, Direction, bool]]:
+    def get_neighbour_slices(self) -> list[tuple[slice, Direction, bool]]:
         return [(slice(0, self.size_x), Direction.RIGHT, self.cyclic_x)]
 
 
@@ -92,7 +92,7 @@ class Grid2D():
         }[direction]
 
 
-    def get_neighbour_slices(self) -> List[Tuple[slice, Direction, bool]]:
+    def get_neighbour_slices(self) -> list[tuple[slice, Direction, bool]]:
         horizontal_neighbours = [
             (slice(self.size_x * j, self.size_x * (j + 1)), Direction.RIGHT, self.cyclic_x)
             for j in range(self.size_y)
